@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 // or "https://smtrepo.herokuapp.com"})
 @CrossOrigin({"*"})
 public class UserController {
-    private static final String SESSIONKEY = "user";
+    private static final String SESSIONKEY = "sessionkey";
     private static final ObjectMapper mapperData = new ObjectMapper();
     @Autowired
     private UserServices.DAO.UserDAO userTemplate;
@@ -39,10 +39,10 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/api/user/{nickname}")
-    public User getUser(@PathVariable("nickname") String nickname, HttpServletResponse response) { //HttpSession httpSession) { //HttpServletResponse response) {
+    @GetMapping(value = "/api/user/get")
+    public User getUser(HttpSession httpSession, HttpServletResponse response) {
         try {
-            final User user = userTemplate.getUser(nickname);
+            final User user = (User) httpSession.getAttribute(SESSIONKEY);
             response.setStatus(HttpServletResponse.SC_OK);
             return user;
         } catch (DataAccessException e) {
@@ -84,9 +84,9 @@ public class UserController {
     public ResponseEntity<?> logout(HttpSession httpSession) {
         if (httpSession.getAttribute(SESSIONKEY) != null) {
             httpSession.invalidate();
-            return ResponseEntity.status(HttpStatus.OK).body("Successful logout");
+            return ResponseEntity.status(HttpStatus.OK).body("You successfully logout");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unsuccessful logout");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You unsuccessful logout");
         }
     }
 
