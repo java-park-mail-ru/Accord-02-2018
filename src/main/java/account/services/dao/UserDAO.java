@@ -1,13 +1,14 @@
-package UserServices.DAO;
+package account.services.dao;
 
 
-import UserServices.Model.User;
+import account.services.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,18 +20,18 @@ public class UserDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public void register(String email, String nickname, String password) throws DataAccessException {
+    public void register(@NotNull User userToRegister) throws DataAccessException {
         String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, email, nickname, password);
+        jdbcTemplate.update(sql, userToRegister.getEmail(), userToRegister.getNickname(), userToRegister.getPassword());
     }
 
 
-    public Boolean login(User userToLogin){
+    public Boolean login(@NotNull User userToLogin) {
         try {
             String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
             User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getNickname()}, new UserMapper());
 
-            if( user.getPassword().equals(userToLogin.getPassword()) ){
+            if (user.getPassword().equals(userToLogin.getPassword())) {
                 return true;
             }
         } catch (DataAccessException e) {
@@ -40,16 +41,22 @@ public class UserDAO {
         return false;
     }
 
-    public User getUser(String nickname) throws DataAccessException {
+    public User getUser(@NotNull User userToGet) throws DataAccessException {
+        String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
+        User user = jdbcTemplate.queryForObject(sql, new Object[]{userToGet.getNickname()}, new UserMapper());
+        return user;
+    }
+
+    public User getUser(@NotNull String nickname) throws DataAccessException {
         String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
         User user = jdbcTemplate.queryForObject(sql, new Object[]{nickname}, new UserMapper());
         return user;
     }
 
-    public void updateUser(User user) throws DataAccessException {
-        final Boolean hasEmail = user.getEmail() != null && !user.getEmail().isEmpty();
-        final Boolean hasPassword = user.getPassword() != null && !user.getPassword().isEmpty();
-        final Boolean hasRating = user.getRating() != null && user.getRating() >= 0;
+    public void updateUser(@NotNull User userToUpdate) throws DataAccessException {
+        final Boolean hasEmail = userToUpdate.getEmail() != null && !userToUpdate.getEmail().isEmpty();
+        final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
+        final Boolean hasRating = userToUpdate.getRating() != null && userToUpdate.getRating() >= 0;
         final Boolean condition = hasEmail || hasPassword || hasRating;
 
         if (condition) {
@@ -58,22 +65,22 @@ public class UserDAO {
 
             if (hasEmail) {
                 sql.append(" email = ?::citext");
-                sqlParameters.add(user.getEmail());
+                sqlParameters.add(userToUpdate.getEmail());
             }
 
             if (hasPassword) {
                 sql.append(" password = ?::citext");
-                sqlParameters.add(user.getPassword());
+                sqlParameters.add(userToUpdate.getPassword());
             }
 
             if (hasRating) {
                 sql.append(" rating = ?");
-                sqlParameters.add(user.getRating());
+                sqlParameters.add(userToUpdate.getRating());
             }
 
             sql.append(" WHERE nickname = ?::citext;");
-            sqlParameters.add(user.getNickname());
-            jdbcTemplate.update( sql.toString(), sqlParameters.toArray() );
+            sqlParameters.add(userToUpdate.getNickname());
+            jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
         }
     }
 
@@ -85,7 +92,6 @@ public class UserDAO {
             user.setEmail(resultSet.getString("email"));
             user.setNickname(resultSet.getString("nickname"));
             user.setPassword(resultSet.getString("password"));
-            user.setId(resultSet.getInt("id"));
 
             return user;
         }

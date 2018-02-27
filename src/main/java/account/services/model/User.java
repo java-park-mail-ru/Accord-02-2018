@@ -1,4 +1,4 @@
-package UserServices.Model;
+package account.services.model;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 public class User {
-    private Integer id;
     private String email;
     private String password;
     private String nickname;
@@ -30,10 +29,6 @@ public class User {
 
     }
 
-    public Integer getId() {
-        return id;
-    }
-
     public String getNickname() {
         return nickname;
     }
@@ -50,10 +45,6 @@ public class User {
         return rating;
     }
 
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
@@ -77,7 +68,6 @@ public class User {
         result.put("password", password);
         result.put("nickname", nickname);
         result.put("rating", rating);
-        result.put("id", id);
 
         return result;
     }
