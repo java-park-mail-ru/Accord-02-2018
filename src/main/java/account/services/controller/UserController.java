@@ -24,7 +24,6 @@ public class UserController {
     private static final String ERROR_PASSWORD = "Error password";
     private static final String ERROR_NICKNAME = "Error nickname";
 
-    private static final ObjectMapper MAPPER_DATA = new ObjectMapper();
 
     @Autowired
     private UserDAO userService;
@@ -81,19 +80,15 @@ public class UserController {
         }
     }
 
-    // никнейм в url нужен для того
-    // чтобы юзер мог менять любые свои данные
-    // в том числе и nickname за один json
-    // при обновления nickname, json с измененными данными
-    // отправляется на старый nickname
-    @PostMapping(value = "/api/user/update/{nickname}")
-    public String update(@PathVariable String nickname, @RequestBody @NotNull User updateData,
+
+    @PostMapping(value = "/api/user/update")
+    public String update(@RequestBody @NotNull User updateData, HttpSession httpSession,
                          HttpServletResponse response) throws JSONException {
         try {
             // попробуем найти уже существующие данные
             // о юзере которому хотим обновить данные
             try {
-                userService.getUser(nickname);
+                userService.getUser((User) httpSession.getAttribute(SESSION_KEY));
             } catch (DataAccessException e) {
                 // если такой юзер не нашелся
                 // то печальбеда - 404

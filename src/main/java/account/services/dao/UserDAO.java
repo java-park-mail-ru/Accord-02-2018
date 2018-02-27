@@ -47,12 +47,6 @@ public class UserDAO {
         return user;
     }
 
-    public User getUser(@NotNull String nickname) throws DataAccessException {
-        String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
-        User user = jdbcTemplate.queryForObject(sql, new Object[]{nickname}, new UserMapper());
-        return user;
-    }
-
     public void updateUser(@NotNull User userToUpdate) throws DataAccessException {
         final Boolean hasEmail = userToUpdate.getEmail() != null && !userToUpdate.getEmail().isEmpty();
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
