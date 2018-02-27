@@ -2,7 +2,6 @@ package account.services.controller;
 
 import account.services.dao.UserDAO;
 import account.services.model.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
