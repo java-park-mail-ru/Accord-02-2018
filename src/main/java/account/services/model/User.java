@@ -1,10 +1,5 @@
 package account.services.model;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-
 public class User {
     private String email;
     private String password;
@@ -60,15 +55,5 @@ public class User {
 
     public void setRating(Integer rating) {
         this.rating = rating;
-    }
-
-    public ObjectNode toObjectNode(ObjectMapper mapper) {
-        final ObjectNode result = mapper.createObjectNode();
-        result.put("email", email);
-        result.put("password", password);
-        result.put("nickname", nickname);
-        result.put("rating", rating);
-
-        return result;
     }
 }

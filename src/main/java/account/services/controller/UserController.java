@@ -58,7 +58,7 @@ public class UserController {
 
         try {
             userService.register(user);
-            return userService.getUser(user).toObjectNode(MAPPER_DATA).toString();
+            return new JSONObject().put("status", "ok").toString();
         } catch (DataAccessException error) {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует

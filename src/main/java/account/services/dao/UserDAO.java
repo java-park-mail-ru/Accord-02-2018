@@ -87,7 +87,7 @@ public class UserDAO {
 
     public static class UserMapper implements RowMapper<User> {
         @Override
-        public User mapRow(ResultSet resultSet, int i) throws SQLException {
+        public User mapRow(ResultSet resultSet, int incParam) throws SQLException {
             User user = new User();
             user.setEmail(resultSet.getString("email"));
             user.setNickname(resultSet.getString("nickname"));
