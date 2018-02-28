@@ -99,9 +99,11 @@ public class UserController {
             // о юзере которому хотим обновить данные
             final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
             final User userForUpdate;
+            final String originalEmail;
 
             if (userFromSession != null) {
                 userForUpdate = userService.getUser(userFromSession.getNickname());
+                originalEmail = userForUpdate.getEmail();
             } else {
                 // если такой юзер не нашелся
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -122,7 +124,7 @@ public class UserController {
             }
 
             // обновляем данные если все хорошо
-            userService.updateUser(userForUpdate);
+            userService.updateUser(userForUpdate, originalEmail);
             response.setStatus(HttpServletResponse.SC_OK);
             return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException e) {
