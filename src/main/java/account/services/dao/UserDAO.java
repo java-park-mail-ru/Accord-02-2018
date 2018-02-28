@@ -28,8 +28,8 @@ public class UserDAO {
 
     public Boolean login(@NotNull User userToLogin) {
         try {
-            String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
-            User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getNickname()}, new UserMapper());
+            String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
+            User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getEmail()}, new UserMapper());
 
             if (user.getPassword().equals(userToLogin.getPassword())) {
                 return true;

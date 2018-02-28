@@ -35,7 +35,7 @@ public class UserController {
     @GetMapping(value = "/connection")
     public String test(HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
-        return "Congratulations, its successful connection";
+        return new JSONObject().put("status", "Congratulations, its successful connection").toString();
     }
 
     @PostMapping(value = "/user/register")
@@ -43,6 +43,9 @@ public class UserController {
         JSONObject responseJson = new JSONObject();
         JSONArray arrayErrorsJson = new JSONArray();
 
+        System.out.println(user.getEmail());
+        System.out.println(user.getPassword());
+        System.out.println(user.getNickname());
 
         if (isEmptyField(user.getEmail())) {
             arrayErrorsJson.put(ERROR_EMAIL);
@@ -70,6 +73,7 @@ public class UserController {
             // значит такой юзер с таким мейлом уже существует
             // (email - primary key в БД)
             // поэтому просто вернем ошибку
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             responseJson.put("error", "Invalid parameters");
             return responseJson.toString();
         }
