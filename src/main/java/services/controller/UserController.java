@@ -1,6 +1,6 @@
 package services.controller;
 
-//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import services.dao.UserDAO;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@CrossOrigin(origins = {"*"}) //, "http://localhost:8000"})
+@CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
     private static final String SESSION_KEY = "SESSION_KEY";
     private static final String ERROR_EMAIL = "Error email";
@@ -23,6 +23,7 @@ public class UserController {
     private static final String ERROR_NICKNAME = "Error nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
 
+    @Autowired
     private final UserDAO userService = new UserDAO();
 
     private boolean isEmptyField(String field) {
@@ -146,6 +147,10 @@ public class UserController {
             response.setMessage(errorString.toString());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.getServerResponse().toString());
         }
+
+        System.out.println(userToLogin.getEmail());
+        System.out.println(userToLogin.getPassword());
+        System.out.println(userToLogin.getNickname());
 
         if (userService.login(userToLogin)) {
             httpSession.setAttribute(SESSION_KEY, userToLogin);
