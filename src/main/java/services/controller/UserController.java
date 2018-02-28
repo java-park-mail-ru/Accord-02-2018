@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
+@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 // or "https://smtrepo.herokuapp.com"})
 @CrossOrigin({"*"})
