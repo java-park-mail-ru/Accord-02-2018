@@ -42,12 +42,12 @@ public class UserDAO {
         return false;
     }
 
-    public User getUser(@NotNull String nickname) throws DataAccessException {
-        final String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
-        return jdbcTemplate.queryForObject(sql, new Object[]{nickname}, new UserMapper());
+    public User getUser(@NotNull String email) throws DataAccessException {
+        final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
+        return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
     }
 
-    public void updateUser(@NotNull User userToUpdate, @NotNull String oldEmail) throws DataAccessException {
+    public void updateUser(@NotNull User userToUpdate) throws DataAccessException {
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
         final Boolean hasNickname = userToUpdate.getNickname() != null && !userToUpdate.getNickname().isEmpty();
         final Boolean hasRating = userToUpdate.getRating() != null && userToUpdate.getRating() >= 0;
@@ -58,7 +58,7 @@ public class UserDAO {
             StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
 
             if (hasNickname) {
-                sql.append("nickname = ?::citext");
+                sql.append(" nickname = ?::citext");
                 sqlParameters.add(userToUpdate.getNickname());
             }
 
@@ -80,6 +80,8 @@ public class UserDAO {
 
             sql.append(" WHERE email = ?::citext;");
             sqlParameters.add(userToUpdate.getEmail());
+
+            System.out.println(sql);
             jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
         }
     }

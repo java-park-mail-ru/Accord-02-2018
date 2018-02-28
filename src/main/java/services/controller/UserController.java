@@ -32,6 +32,9 @@ public class UserController {
         return ((field == null) || field.isEmpty());
     }
 
+    private boolean isValidField(Integer field) {
+        return ((field != null) && (field >= 0));
+    }
 
     @GetMapping(value = "/connection")
     public String test(HttpServletResponse response) {
@@ -99,11 +102,9 @@ public class UserController {
             // о юзере которому хотим обновить данные
             final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
             final User userForUpdate;
-            final String originalEmail;
 
             if (userFromSession != null) {
-                userForUpdate = userService.getUser(userFromSession.getNickname());
-                originalEmail = userForUpdate.getEmail();
+                userForUpdate = userService.getUser(userFromSession.getEmail());
             } else {
                 // если такой юзер не нашелся
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -111,20 +112,20 @@ public class UserController {
             }
 
             // переместим значения ненулевых полей
-            if (isEmptyField(updateData.getEmail())) {
-                userForUpdate.setEmail(updateData.getEmail());
+            if (isValidField(updateData.getRating())) {
+                userForUpdate.setRating(updateData.getRating());
             }
 
-            if (isEmptyField(updateData.getPassword())) {
+            if (!isEmptyField(updateData.getPassword())) {
                 userForUpdate.setPassword(updateData.getPassword());
             }
 
-            if (isEmptyField(updateData.getNickname())) {
+            if (!isEmptyField(updateData.getNickname())) {
                 userForUpdate.setNickname(updateData.getNickname());
             }
 
             // обновляем данные если все хорошо
-            userService.updateUser(userForUpdate, originalEmail);
+            userService.updateUser(userForUpdate);
             response.setStatus(HttpServletResponse.SC_OK);
             return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException e) {
