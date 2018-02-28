@@ -41,9 +41,9 @@ public class UserDAO {
         return false;
     }
 
-    public User getUser(@NotNull User userToGet) throws DataAccessException {
+    public User getUser(@NotNull String nickname) throws DataAccessException {
         String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
-        User user = jdbcTemplate.queryForObject(sql, new Object[]{userToGet.getNickname()}, new UserMapper());
+        User user = jdbcTemplate.queryForObject(sql, new Object[]{nickname}, new UserMapper());
         return user;
     }
 

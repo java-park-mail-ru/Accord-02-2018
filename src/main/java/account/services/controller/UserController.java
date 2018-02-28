@@ -35,17 +35,13 @@ public class UserController {
     @GetMapping(value = "/connection")
     public String test(HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
-        return new JSONObject().put("status", "Congratulations, its successful connection").toString();
+        return new JSONObject().put("status", "OK. Congratulations, its successful connection").toString();
     }
 
     @PostMapping(value = "/user/register")
     public String register(@RequestBody @NotNull User user, HttpServletResponse response) throws JSONException {
         JSONObject responseJson = new JSONObject();
         JSONArray arrayErrorsJson = new JSONArray();
-
-        System.out.println(user.getEmail());
-        System.out.println(user.getPassword());
-        System.out.println(user.getNickname());
 
         if (isEmptyField(user.getEmail())) {
             arrayErrorsJson.put(ERROR_EMAIL);
@@ -81,12 +77,13 @@ public class UserController {
 
     @GetMapping(value = "/user/get")
     public String getUser(HttpSession httpSession, HttpServletResponse response) {
-        try {
-            final User user = (User) httpSession.getAttribute(SESSION_KEY);
+        final User user = (User) httpSession.getAttribute(SESSION_KEY);
+
+        if (user != null) {
+            response.setStatus(HttpServletResponse.SC_OK);
             return user.getUser().toString();
-        } catch (DataAccessException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            System.out.println(e);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         }
     }
@@ -99,7 +96,8 @@ public class UserController {
             // попробуем найти уже существующие данные
             // о юзере которому хотим обновить данные
             try {
-                userService.getUser((User) httpSession.getAttribute(SESSION_KEY));
+                User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
+                userService.getUser(userFromSession.getNickname());
             } catch (DataAccessException e) {
                 // если такой юзер не нашелся
                 // то печальбеда - 404
@@ -128,7 +126,7 @@ public class UserController {
             arrayErrorsJson.put(ERROR_EMAIL);
         }
 
-        if (isEmptyField(userToLogin.getPassword())) {
+        if (isEmptyField(userToLogin.getPassword()) || userToLogin.getPassword().length() > 255) {
             arrayErrorsJson.put(ERROR_PASSWORD);
         }
 
