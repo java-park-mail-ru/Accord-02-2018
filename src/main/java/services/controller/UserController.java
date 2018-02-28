@@ -1,7 +1,7 @@
-package account.services.controller;
+package services.controller;
 
-import account.services.dao.UserDAO;
-import account.services.model.User;
+import services.dao.UserDAO;
+import services.model.User;
 import org.json.JSONException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class UserController {
     private static final String ERROR_EMAIL = "Error email";
     private static final String ERROR_PASSWORD = "Error password";
     private static final String ERROR_NICKNAME = "Error nickname";
-
+    private static final int MAX_LENGTH_PASSWORD = 255;
 
     @Autowired
     private UserDAO userService;
@@ -40,8 +40,8 @@ public class UserController {
 
     @PostMapping(value = "/user/register")
     public String register(@RequestBody @NotNull User user, HttpServletResponse response) throws JSONException {
-        JSONObject responseJson = new JSONObject();
-        JSONArray arrayErrorsJson = new JSONArray();
+        final JSONObject responseJson = new JSONObject();
+        final JSONArray arrayErrorsJson = new JSONArray();
 
         if (isEmptyField(user.getEmail())) {
             arrayErrorsJson.put(ERROR_EMAIL);
@@ -96,18 +96,32 @@ public class UserController {
         try {
             // попробуем найти уже существующие данные
             // о юзере которому хотим обновить данные
-            User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
+            final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
+            final User userForUpdate;
 
             if (userFromSession != null) {
-                userService.getUser(userFromSession.getNickname());
+                userForUpdate = userService.getUser(userFromSession.getNickname());
             } else {
                 // если такой юзер не нашелся
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return null;
             }
 
+            // переместим значения ненулевых полей
+            if (isEmptyField(updateData.getEmail())) {
+                userForUpdate.setEmail(updateData.getEmail());
+            }
+
+            if (isEmptyField(updateData.getPassword())) {
+                userForUpdate.setPassword(updateData.getPassword());
+            }
+
+            if (isEmptyField(updateData.getNickname())) {
+                userForUpdate.setNickname(updateData.getNickname());
+            }
+
             // обновляем данные если все хорошо
-            userService.updateUser(updateData);
+            userService.updateUser(userForUpdate);
             response.setStatus(HttpServletResponse.SC_OK);
             return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException e) {
@@ -120,14 +134,14 @@ public class UserController {
     @PostMapping(value = "/login")
     public String login(@RequestBody User userToLogin, HttpSession httpSession,
                         HttpServletResponse response) throws JSONException {
-        JSONObject responseJson = new JSONObject();
-        JSONArray arrayErrorsJson = new JSONArray();
+        final JSONObject responseJson = new JSONObject();
+        final JSONArray arrayErrorsJson = new JSONArray();
 
         if (isEmptyField(userToLogin.getEmail())) {
             arrayErrorsJson.put(ERROR_EMAIL);
         }
 
-        if (isEmptyField(userToLogin.getPassword()) || userToLogin.getPassword().length() > 255) {
+        if (isEmptyField(userToLogin.getPassword()) || userToLogin.getPassword().length() > MAX_LENGTH_PASSWORD) {
             arrayErrorsJson.put(ERROR_PASSWORD);
         }
 
@@ -151,7 +165,7 @@ public class UserController {
 
     @PostMapping(value = "/logout")
     public String logout(HttpSession httpSession, HttpServletResponse response) throws JSONException {
-        JSONObject responseJson = new JSONObject();
+        final JSONObject responseJson = new JSONObject();
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {
             httpSession.invalidate();

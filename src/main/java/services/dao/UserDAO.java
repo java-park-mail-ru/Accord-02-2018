@@ -1,7 +1,7 @@
-package account.services.dao;
+package services.dao;
 
 
-import account.services.model.User;
+import services.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,15 +21,15 @@ public class UserDAO {
     private JdbcTemplate jdbcTemplate;
 
     public void register(@NotNull User userToRegister) throws DataAccessException {
-        String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, userToRegister.getEmail(), userToRegister.getNickname(), userToRegister.getPassword());
     }
 
 
     public Boolean login(@NotNull User userToLogin) {
         try {
-            String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
-            User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getEmail()}, new UserMapper());
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
+            final User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getEmail()}, new UserMapper());
 
             if (user.getPassword().equals(userToLogin.getPassword())) {
                 return true;
@@ -42,9 +42,8 @@ public class UserDAO {
     }
 
     public User getUser(@NotNull String nickname) throws DataAccessException {
-        String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
-        User user = jdbcTemplate.queryForObject(sql, new Object[]{nickname}, new UserMapper());
-        return user;
+        final String sql = "SELECT * FROM \"User\" WHERE nickname = ?::citext";
+        return jdbcTemplate.queryForObject(sql, new Object[]{nickname}, new UserMapper());
     }
 
     public void updateUser(@NotNull User userToUpdate) throws DataAccessException {
@@ -55,7 +54,7 @@ public class UserDAO {
 
         if (condition) {
             final List<Object> sqlParameters = new ArrayList<>();
-            StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
+            final StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
 
             if (hasEmail) {
                 sql.append(" email = ?::citext");
@@ -82,7 +81,7 @@ public class UserDAO {
     public static class UserMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet resultSet, int incParam) throws SQLException {
-            User user = new User();
+            final User user = new User();
             user.setEmail(resultSet.getString("email"));
             user.setNickname(resultSet.getString("nickname"));
             user.setPassword(resultSet.getString("password"));
