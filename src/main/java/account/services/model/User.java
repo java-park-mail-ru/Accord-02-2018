@@ -1,5 +1,8 @@
 package account.services.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class User {
     private String email;
     private String password;
@@ -22,6 +25,21 @@ public class User {
 
     public User() {
 
+    }
+
+    @JsonCreator
+    public User(
+            @JsonProperty("email") String email,
+            @JsonProperty("nickname") String nickname,
+            @JsonProperty("rating") Integer rating
+    ) {
+        this.email = email;
+        this.nickname = nickname;
+        this.rating = rating;
+    }
+
+    public Object getUser() {
+        return this;
     }
 
     public String getNickname() {

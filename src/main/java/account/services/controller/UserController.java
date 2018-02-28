@@ -31,8 +31,15 @@ public class UserController {
         return ((field == null) || field.isEmpty());
     }
 
-    @PostMapping(value = "/api/user/register")
-    public String register(@RequestBody @NotNull User user) throws JSONException {
+
+    @GetMapping(value = "/connection")
+    public String test(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        return "Congratulations, its successful connection";
+    }
+
+    @PostMapping(value = "/user/register")
+    public String register(@RequestBody @NotNull User user, HttpServletResponse response) throws JSONException {
         JSONObject responseJson = new JSONObject();
         JSONArray arrayErrorsJson = new JSONArray();
 
@@ -50,28 +57,29 @@ public class UserController {
         }
 
         if (arrayErrorsJson.length() > 0) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             responseJson.put("errors", arrayErrorsJson);
             return responseJson.toString();
         }
 
         try {
             userService.register(user);
-            return new JSONObject().put("status", "ok").toString();
+            return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException error) {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // (email - primary key в БД)
             // поэтому просто вернем ошибку
-            responseJson.put("error", "Email not available");
+            responseJson.put("error", "Invalid parameters");
             return responseJson.toString();
         }
     }
 
-    @GetMapping(value = "/api/user/get")
-    public User getUser(HttpSession httpSession, HttpServletResponse response) {
+    @GetMapping(value = "/user/get")
+    public String getUser(HttpSession httpSession, HttpServletResponse response) {
         try {
             final User user = (User) httpSession.getAttribute(SESSION_KEY);
-            return user;
+            return user.getUser().toString();
         } catch (DataAccessException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             System.out.println(e);
@@ -80,7 +88,7 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/api/user/update")
+    @PostMapping(value = "/user/update")
     public String update(@RequestBody @NotNull User updateData, HttpSession httpSession,
                          HttpServletResponse response) throws JSONException {
         try {
@@ -98,7 +106,7 @@ public class UserController {
             // обновляем данные если все хорошо
             userService.updateUser(updateData);
             response.setStatus(HttpServletResponse.SC_OK);
-            return new JSONObject().put("status", "ok").toString();
+            return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException e) {
             // произошел конфликт
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -107,7 +115,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public String login(@RequestBody User userToLogin, HttpSession httpSession) throws JSONException {
+    public String login(@RequestBody User userToLogin, HttpSession httpSession,
+                        HttpServletResponse response) throws JSONException {
         JSONObject responseJson = new JSONObject();
         JSONArray arrayErrorsJson = new JSONArray();
 
@@ -126,9 +135,10 @@ public class UserController {
 
         if (userService.login(userToLogin)) {
             httpSession.setAttribute(SESSION_KEY, userToLogin);
-            responseJson.put("status", "ok");
+            responseJson.put("status", "Ok");
         } else {
-            responseJson.put("error", "invalid email or password");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            responseJson.put("error", "Invalid email or password");
         }
 
         return responseJson.toString();
@@ -141,9 +151,9 @@ public class UserController {
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {
             httpSession.invalidate();
-            responseJson.put("status", "ok");
+            responseJson.put("status", "Ok");
         } else {
-            responseJson.put("error", "unsuccesful logout");
+            responseJson.put("error", "Unsuccesful logout");
         }
 
         return responseJson.toString();
