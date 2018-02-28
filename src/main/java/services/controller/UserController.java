@@ -1,20 +1,19 @@
 package services.controller;
 
+//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import services.dao.UserDAO;
+import services.model.ServerResponse;
 import services.model.User;
 import org.json.JSONException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
-@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 @CrossOrigin({"*"})
 public class UserController {
@@ -24,8 +23,7 @@ public class UserController {
     private static final String ERROR_NICKNAME = "Error nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
 
-    @Autowired
-    private UserDAO userService;
+    private final UserDAO userService = new UserDAO();
 
     private boolean isEmptyField(String field) {
         return ((field == null) || field.isEmpty());
@@ -35,66 +33,64 @@ public class UserController {
         return ((field != null) && (field >= 0));
     }
 
+
     @GetMapping(value = "/connection")
-    public String test(HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        return new JSONObject().put("status", "OK. Congratulations, its successful connection").toString();
+    public ResponseEntity<String> connection() {
+        final ServerResponse response = new ServerResponse("OK", "Congratulations, its successful connection");
+        return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
     }
 
     @PostMapping(value = "/user/register")
-    public String register(@RequestBody @NotNull User user, HttpServletResponse response) throws JSONException {
-        final JSONObject responseJson = new JSONObject();
-        final JSONArray arrayErrorsJson = new JSONArray();
+    public ResponseEntity<String> register(@RequestBody @NotNull User user) throws JSONException {
+        final ServerResponse response = new ServerResponse();
+        final StringBuilder errorString = new StringBuilder();
 
         if (isEmptyField(user.getEmail())) {
-            arrayErrorsJson.put(ERROR_EMAIL);
+            errorString.append(ERROR_EMAIL);
         }
 
         if (isEmptyField(user.getPassword())) {
-            arrayErrorsJson.put(ERROR_PASSWORD);
+            errorString.append(' ' + ERROR_PASSWORD);
         }
 
         if (isEmptyField(user.getNickname())) {
-            arrayErrorsJson.put(ERROR_NICKNAME);
+            errorString.append(' ' + ERROR_NICKNAME);
         }
 
-        if (arrayErrorsJson.length() > 0) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            responseJson.put("errors", arrayErrorsJson);
-            return responseJson.toString();
+        if (errorString.length() > 0) {
+            response.setStatus("Error");
+            response.setMessage(errorString.toString());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.getServerResponse().toString());
         }
 
-        try {
-            userService.register(user);
-            response.setStatus(HttpServletResponse.SC_OK);
-            return new JSONObject().put("status", "Ok").toString();
-        } catch (DataAccessException error) {
+        if (userService.register(user)) {
+            response.setStatus("Ok");
+            response.setMessage("Successful registration");
+            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+        } else {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            responseJson.put("error", "Invalid parameters");
-            return responseJson.toString();
+            response.setStatus("Error");
+            response.setMessage("Invalid parameters");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.getServerResponse().toString());
         }
     }
 
     @GetMapping(value = "/user/get")
-    public String getUser(HttpSession httpSession, HttpServletResponse response) {
+    public ResponseEntity<String> getUser(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
         if (userFromSession != null) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            return userFromSession.getUser().toString();
+            return ResponseEntity.status(HttpStatus.OK).body(userFromSession.getUser().toString());
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return null;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
 
     @PostMapping(value = "/user/update")
-    public String update(@RequestBody @NotNull User updateData, HttpSession httpSession,
-                         HttpServletResponse response) throws JSONException {
+    public ResponseEntity<String> update(@RequestBody @NotNull User updateData, HttpSession httpSession) throws JSONException {
         try {
             // попробуем найти уже существующие данные
             // о юзере которому хотим обновить данные
@@ -105,8 +101,7 @@ public class UserController {
                 userForUpdate = userService.getUser(userFromSession.getEmail());
             } else {
                 // если такой юзер не нашелся
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return null;
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
 
             // переместим значения ненулевых полей
@@ -124,60 +119,62 @@ public class UserController {
 
             // обновляем данные если все хорошо
             userService.updateUser(userForUpdate);
-            response.setStatus(HttpServletResponse.SC_OK);
-            return new JSONObject().put("status", "Ok").toString();
+            final ServerResponse response = new ServerResponse("Ok", "Successful update");
+            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
         } catch (DataAccessException e) {
             // произошел конфликт
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            return null;
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
     }
 
     @PostMapping(value = "/login")
-    public String login(@RequestBody User userToLogin, HttpSession httpSession,
-                        HttpServletResponse response) throws JSONException {
-        final JSONObject responseJson = new JSONObject();
-        final JSONArray arrayErrorsJson = new JSONArray();
+    public ResponseEntity<String> login(@RequestBody User userToLogin, HttpSession httpSession) throws JSONException {
+        final ServerResponse response = new ServerResponse();
+        final StringBuilder errorString = new StringBuilder();
+
 
         if (isEmptyField(userToLogin.getEmail())) {
-            arrayErrorsJson.put(ERROR_EMAIL);
+            errorString.append(ERROR_EMAIL);
         }
 
         if (isEmptyField(userToLogin.getPassword()) || userToLogin.getPassword().length() > MAX_LENGTH_PASSWORD) {
-            arrayErrorsJson.put(ERROR_PASSWORD);
+            errorString.append(' ' + ERROR_PASSWORD);
         }
 
-        if (arrayErrorsJson.length() > 0) {
-            responseJson.put("error", arrayErrorsJson);
-            return responseJson.toString();
+        if (errorString.length() > 0) {
+            response.setStatus("Error");
+            response.setMessage(errorString.toString());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.getServerResponse().toString());
         }
 
         if (userService.login(userToLogin)) {
-            response.setStatus(HttpServletResponse.SC_OK);
             httpSession.setAttribute(SESSION_KEY, userToLogin);
-            responseJson.put("status", "Ok");
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            responseJson.put("error", "Invalid email or password");
-        }
 
-        return responseJson.toString();
+            response.setStatus("Ok");
+            response.setMessage("Successful registration");
+            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+        } else {
+            response.setStatus("Error");
+            response.setMessage("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.getServerResponse().toString());
+        }
     }
 
 
     @PostMapping(value = "/logout")
-    public String logout(HttpSession httpSession, HttpServletResponse response) throws JSONException {
-        final JSONObject responseJson = new JSONObject();
+    public ResponseEntity<String> logout(HttpSession httpSession) throws JSONException {
+        final ServerResponse response = new ServerResponse();
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {
             httpSession.invalidate();
-            response.setStatus(HttpServletResponse.SC_OK);
-            responseJson.put("status", "Ok");
-        } else {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            responseJson.put("error", "Unsuccesful logout");
-        }
 
-        return responseJson.toString();
+            response.setStatus("Ok");
+            response.setMessage("Successful logout");
+            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+        } else {
+            response.setStatus("Error");
+            response.setMessage("Unsuccessful logout");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.getServerResponse().toString());
+        }
     }
 }

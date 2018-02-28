@@ -21,9 +21,14 @@ public class UserDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public void register(@NotNull User userToRegister) throws DataAccessException {
-        final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, userToRegister.getEmail(), userToRegister.getNickname(), userToRegister.getPassword());
+    public Boolean register(@NotNull User userToRegister) {
+        try {
+            final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
+            jdbcTemplate.update(sql, userToRegister.getEmail(), userToRegister.getNickname(), userToRegister.getPassword());
+            return true;
+        } catch (DataAccessException e) {
+            return false;
+        }
     }
 
 
