@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
-// or "https://smtrepo.herokuapp.com"})
 @CrossOrigin({"*"})
 public class UserController {
     private static final String SESSION_KEY = "SESSION_KEY";
@@ -72,7 +71,6 @@ public class UserController {
         } catch (DataAccessException error) {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
-            // (email - primary key в БД)
             // поэтому просто вернем ошибку
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             responseJson.put("error", "Invalid parameters");
@@ -130,7 +128,7 @@ public class UserController {
             return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException e) {
             // произошел конфликт
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
     }
