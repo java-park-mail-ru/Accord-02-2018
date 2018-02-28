@@ -63,6 +63,7 @@ public class UserController {
 
         try {
             userService.register(user);
+            response.setStatus(HttpServletResponse.SC_OK);
             return new JSONObject().put("status", "Ok").toString();
         } catch (DataAccessException error) {
             // если попали в этот блок
@@ -136,6 +137,7 @@ public class UserController {
         }
 
         if (userService.login(userToLogin)) {
+            response.setStatus(HttpServletResponse.SC_OK);
             httpSession.setAttribute(SESSION_KEY, userToLogin);
             responseJson.put("status", "Ok");
         } else {
@@ -153,6 +155,7 @@ public class UserController {
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {
             httpSession.invalidate();
+            response.setStatus(HttpServletResponse.SC_OK);
             responseJson.put("status", "Ok");
         } else {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
