@@ -3,7 +3,7 @@ package services.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "StringBufferReplaceableByString"})
 public class ServerResponse {
     private String status;
     private String message;
@@ -33,11 +33,11 @@ public class ServerResponse {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\n").append("\"status\": ")
-                .append("\"").append(this.status).append("\",").append("\n")
+                .append('\"').append(this.status).append("\",").append('\n')
                 .append("\"message\": ")
-                .append("\"").append(this.message).append("\"").append("\n}");
+                .append('\"').append(this.message).append('\"').append("\n}");
 
         return stringBuilder.toString();
     }
