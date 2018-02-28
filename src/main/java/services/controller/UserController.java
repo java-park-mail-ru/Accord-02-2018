@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@CrossOrigin(origins = {"*", "http://localhost:8000"})
+@CrossOrigin(origins = {"*"}) //, "http://localhost:8000"})
 public class UserController {
     private static final String SESSION_KEY = "SESSION_KEY";
     private static final String ERROR_EMAIL = "Error email";
