@@ -31,6 +31,18 @@ public class ServerResponse {
         return this;
     }
 
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{\n").append("\"status\": ")
+                .append("\"").append(this.status).append("\",").append("\n")
+                .append("\"message\": ")
+                .append("\"").append(this.message).append("\"").append("\n}");
+
+        return stringBuilder.toString();
+    }
+
+
     public String getStatus() {
         return status;
     }

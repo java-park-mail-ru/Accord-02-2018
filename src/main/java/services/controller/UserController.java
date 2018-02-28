@@ -1,12 +1,13 @@
 package services.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import services.dao.UserDAO;
 import services.model.ServerResponse;
 import services.model.User;
-import org.json.JSONException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/user/register")
-    public ResponseEntity<String> register(@RequestBody @NotNull User user) throws JSONException {
+    public ResponseEntity<String> register(@RequestBody @NotNull User user) {
         final ServerResponse response = new ServerResponse();
         final StringBuilder errorString = new StringBuilder();
 
@@ -91,7 +92,7 @@ public class UserController {
 
 
     @PostMapping(value = "/user/update")
-    public ResponseEntity<String> update(@RequestBody @NotNull User updateData, HttpSession httpSession) throws JSONException {
+    public ResponseEntity<String> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
         try {
             // попробуем найти уже существующие данные
             // о юзере которому хотим обновить данные
@@ -129,7 +130,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<String> login(@RequestBody User userToLogin, HttpSession httpSession) throws JSONException {
+    public ResponseEntity<String> login(@RequestBody User userToLogin, HttpSession httpSession) {
         final ServerResponse response = new ServerResponse();
         final StringBuilder errorString = new StringBuilder();
 
@@ -148,15 +149,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.getServerResponse().toString());
         }
 
-        System.out.println(userToLogin.getEmail());
-        System.out.println(userToLogin.getPassword());
-        System.out.println(userToLogin.getNickname());
-
         if (userService.login(userToLogin)) {
             httpSession.setAttribute(SESSION_KEY, userToLogin);
 
             response.setStatus("Ok");
-            response.setMessage("Successful registration");
+            response.setMessage("Successful login");
             return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
         } else {
             response.setStatus("Error");
@@ -167,7 +164,7 @@ public class UserController {
 
 
     @PostMapping(value = "/logout")
-    public ResponseEntity<String> logout(HttpSession httpSession) throws JSONException {
+    public ResponseEntity<String> logout(HttpSession httpSession) {
         final ServerResponse response = new ServerResponse();
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {
