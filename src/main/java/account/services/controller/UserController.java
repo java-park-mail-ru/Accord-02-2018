@@ -77,11 +77,11 @@ public class UserController {
 
     @GetMapping(value = "/user/get")
     public String getUser(HttpSession httpSession, HttpServletResponse response) {
-        final User user = (User) httpSession.getAttribute(SESSION_KEY);
+        final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
-        if (user != null) {
+        if (userFromSession != null) {
             response.setStatus(HttpServletResponse.SC_OK);
-            return user.getUser().toString();
+            return userFromSession.getUser().toString();
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
@@ -95,13 +95,13 @@ public class UserController {
         try {
             // попробуем найти уже существующие данные
             // о юзере которому хотим обновить данные
-            try {
-                User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
+            User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
+
+            if (userFromSession != null) {
                 userService.getUser(userFromSession.getNickname());
-            } catch (DataAccessException e) {
+            } else {
                 // если такой юзер не нашелся
-                // то печальбеда - 404
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return null;
             }
 
@@ -148,13 +148,14 @@ public class UserController {
 
 
     @PostMapping(value = "/logout")
-    public String logout(HttpSession httpSession) throws JSONException {
+    public String logout(HttpSession httpSession, HttpServletResponse response) throws JSONException {
         JSONObject responseJson = new JSONObject();
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {
             httpSession.invalidate();
             responseJson.put("status", "Ok");
         } else {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             responseJson.put("error", "Unsuccesful logout");
         }
 
