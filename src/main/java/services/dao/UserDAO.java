@@ -48,32 +48,38 @@ public class UserDAO {
     }
 
     public void updateUser(@NotNull User userToUpdate, @NotNull String oldEmail) throws DataAccessException {
-        final Boolean hasEmail = userToUpdate.getEmail() != null && !userToUpdate.getEmail().isEmpty();
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
+        final Boolean hasNickname = userToUpdate.getNickname() != null && !userToUpdate.getNickname().isEmpty();
         final Boolean hasRating = userToUpdate.getRating() != null && userToUpdate.getRating() >= 0;
-        final Boolean condition = hasEmail || hasPassword || hasRating;
+        final Boolean condition = hasNickname || hasPassword || hasRating;
 
         if (condition) {
             final List<Object> sqlParameters = new ArrayList<>();
-            final StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
+            StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
 
-            if (hasEmail) {
-                sql.append(" nickname = ?::citext");
-                sqlParameters.add(userToUpdate.getEmail());
+            if (hasNickname) {
+                sql.append("nickname = ?::citext");
+                sqlParameters.add(userToUpdate.getNickname());
             }
 
             if (hasPassword) {
+                if (hasNickname) {
+                    sql.append(",");
+                }
                 sql.append(" password = ?::citext");
                 sqlParameters.add(userToUpdate.getPassword());
             }
 
             if (hasRating) {
+                if (hasNickname || hasPassword) {
+                    sql.append(",");
+                }
                 sql.append(" rating = ?");
                 sqlParameters.add(userToUpdate.getRating());
             }
 
             sql.append(" WHERE email = ?::citext;");
-            sqlParameters.add(oldEmail);
+            sqlParameters.add(userToUpdate.getEmail());
             jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
         }
     }
