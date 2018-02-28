@@ -16,3 +16,4 @@ Bubble Wars - веб-версия игры Auralux
 
 ### Описание API в swagger.yml
 ### [Ссылка на backend-accord-02-2018.herokuapp.com](https://backend-accord-02-2018.herokuapp.com/)
+### [Описание API в swaggerhub](https://app.swaggerhub.com/apis/Meganster/Tech_API/1.0.0)
