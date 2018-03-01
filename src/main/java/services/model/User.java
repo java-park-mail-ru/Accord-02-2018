@@ -1,8 +1,5 @@
 package services.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.json.JSONObject;
 
 @SuppressWarnings("unused")
 public class User {
@@ -27,30 +24,6 @@ public class User {
 
     public User() {
 
-    }
-
-    @JsonCreator
-    public User(
-            @JsonProperty("email") String email,
-            @JsonProperty("nickname") String nickname,
-            @JsonProperty("rating") Integer rating
-    ) {
-        this.email = email;
-        this.nickname = nickname;
-        this.rating = rating;
-    }
-
-    public JSONObject toJSON() {
-        final JSONObject json = new JSONObject();
-        json.put("rating", this.rating);
-        json.put("nickname", this.nickname);
-        json.put("email", this.email);
-
-        return json;
-    }
-
-    public Object getUser() {
-        return this;
     }
 
     public String getNickname() {

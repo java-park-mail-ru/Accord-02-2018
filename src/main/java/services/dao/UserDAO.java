@@ -52,7 +52,7 @@ public class UserDAO {
         return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
     }
 
-    public void updateUser(@NotNull User userToUpdate) throws DataAccessException {
+    public Boolean updateUser(@NotNull User userToUpdate) {
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
         final Boolean hasNickname = userToUpdate.getNickname() != null && !userToUpdate.getNickname().isEmpty();
         final Boolean hasRating = userToUpdate.getRating() != null && userToUpdate.getRating() >= 0;
@@ -86,9 +86,15 @@ public class UserDAO {
             sql.append(" WHERE email = ?::citext;");
             sqlParameters.add(userToUpdate.getEmail());
 
-            System.out.println(sql);
-            jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
+            try {
+                jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
+                return true;
+            } catch (DataAccessException e) {
+                return false;
+            }
         }
+
+        return false;
     }
 
 

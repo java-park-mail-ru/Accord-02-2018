@@ -1,10 +1,7 @@
 package services.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.json.JSONObject;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("unused")
 public class ServerResponse {
     private String status;
     private String message;
@@ -14,11 +11,7 @@ public class ServerResponse {
 
     }
 
-    @JsonCreator
-    public ServerResponse(
-            @JsonProperty("status") String status,
-            @JsonProperty("message") String message
-    ) {
+    public ServerResponse(String status, String message) {
         this.status = status;
         this.message = message;
     }
@@ -26,18 +19,6 @@ public class ServerResponse {
     public ServerResponse(ServerResponse serverResponse) {
         this.status = serverResponse.status;
         this.message = serverResponse.message;
-    }
-
-    public Object getServerResponse() {
-        return this;
-    }
-
-    public JSONObject toJSON() {
-        final JSONObject json = new JSONObject();
-        json.put("message", this.getMessage());
-        json.put("status", this.getStatus());
-
-        return json;
     }
 
 
