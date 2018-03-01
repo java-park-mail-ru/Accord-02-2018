@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/user/register")
-    public ResponseEntity<String> register(@RequestBody @NotNull User user) {
+    public ResponseEntity<String> register(@RequestBody @NotNull User user, HttpSession httpSession) {
         final ServerResponse response = new ServerResponse();
         final StringBuilder errorString = new StringBuilder();
 
