@@ -83,7 +83,7 @@ public class UserController {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
         if (userFromSession != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(userFromSession.getUser().toString());
+            return ResponseEntity.status(HttpStatus.OK).body(userFromSession.toJSON().toString());
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }

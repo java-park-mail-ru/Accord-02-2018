@@ -2,6 +2,7 @@ package services.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.json.JSONObject;
 
 @SuppressWarnings("unused")
 public class User {
@@ -37,6 +38,16 @@ public class User {
         this.email = email;
         this.nickname = nickname;
         this.rating = rating;
+    }
+
+    public JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        json.put("rating", this.rating);
+        json.put("nickname", this.nickname);
+        json.put("password", this.password);
+        json.put("email", this.email);
+
+        return json;
     }
 
     public Object getUser() {
