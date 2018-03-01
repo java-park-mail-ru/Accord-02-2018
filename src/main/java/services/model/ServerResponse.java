@@ -2,6 +2,7 @@ package services.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.json.JSONObject;
 
 @SuppressWarnings({"unused", "StringBufferReplaceableByString"})
 public class ServerResponse {
@@ -31,15 +32,12 @@ public class ServerResponse {
         return this;
     }
 
-    @Override
-    public String toString(){
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{\n").append("\"status\": ")
-                .append('\"').append(this.status).append("\",").append('\n')
-                .append("\"message\": ")
-                .append('\"').append(this.message).append('\"').append("\n}");
+    public JSONObject toJSON() {
+        final JSONObject json = new JSONObject();
+        json.put("message", this.getMessage());
+        json.put("status", this.getStatus());
 
-        return stringBuilder.toString();
+        return json;
     }
 
 

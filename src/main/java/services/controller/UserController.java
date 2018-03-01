@@ -38,7 +38,7 @@ public class UserController {
     @GetMapping(value = "/connection")
     public ResponseEntity<String> connection() {
         final ServerResponse response = new ServerResponse("OK", "Congratulations, its successful connection");
-        return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+        return ResponseEntity.status(HttpStatus.OK).body(response.toJSON().toString());
     }
 
     @PostMapping(value = "/user/register")
