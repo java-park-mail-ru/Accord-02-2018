@@ -61,20 +61,20 @@ public class UserController {
         if (errorString.length() > 0) {
             response.setStatus("Error");
             response.setMessage(errorString.toString());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toJSON().toString());
         }
 
         if (userService.register(user)) {
             response.setStatus("Ok");
             response.setMessage("Successful registration");
-            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response.toJSON().toString());
         } else {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
             response.setStatus("Error");
             response.setMessage("Invalid parameters");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toJSON().toString());
         }
     }
 
@@ -121,7 +121,7 @@ public class UserController {
             // обновляем данные если все хорошо
             userService.updateUser(userForUpdate);
             final ServerResponse response = new ServerResponse("Ok", "Successful update");
-            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response.toJSON().toString());
         } catch (DataAccessException e) {
             // произошел конфликт
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
@@ -145,7 +145,7 @@ public class UserController {
         if (errorString.length() > 0) {
             response.setStatus("Error");
             response.setMessage(errorString.toString());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.toJSON().toString());
         }
 
         if (userService.login(userToLogin)) {
@@ -153,11 +153,11 @@ public class UserController {
 
             response.setStatus("Ok");
             response.setMessage("Successful login");
-            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response.toJSON().toString());
         } else {
             response.setStatus("Error");
             response.setMessage("Invalid email or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response.toJSON().toString());
         }
     }
 
@@ -171,11 +171,11 @@ public class UserController {
 
             response.setStatus("Ok");
             response.setMessage("Successful logout");
-            return ResponseEntity.status(HttpStatus.OK).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response.toJSON().toString());
         } else {
             response.setStatus("Error");
             response.setMessage("Unsuccessful logout");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.getServerResponse().toString());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toJSON().toString());
         }
     }
 }

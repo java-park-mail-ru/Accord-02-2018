@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.JSONObject;
 
-@SuppressWarnings({"unused", "StringBufferReplaceableByString"})
+@SuppressWarnings("ALL")
 public class ServerResponse {
     private String status;
     private String message;
