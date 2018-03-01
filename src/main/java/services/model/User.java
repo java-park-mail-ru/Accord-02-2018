@@ -44,7 +44,6 @@ public class User {
         final JSONObject json = new JSONObject();
         json.put("rating", this.rating);
         json.put("nickname", this.nickname);
-        json.put("password", this.password);
         json.put("email", this.email);
 
         return json;
