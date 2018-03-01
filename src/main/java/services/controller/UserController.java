@@ -65,6 +65,8 @@ public class UserController {
         }
 
         if (userService.register(user)) {
+            httpSession.setAttribute(SESSION_KEY, user);
+            
             response.setStatus("Ok");
             response.setMessage("Successful registration");
             return ResponseEntity.status(HttpStatus.OK).body(response.toJSON().toString());
