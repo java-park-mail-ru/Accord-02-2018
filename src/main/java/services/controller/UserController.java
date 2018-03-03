@@ -80,13 +80,14 @@ public class UserController {
     }
 
     @GetMapping(value = "/user/get")
-    public ResponseEntity<User> getUser(HttpSession httpSession) {
+    public ResponseEntity<?> getUser(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
         if (userFromSession != null) {
             return ResponseEntity.status(HttpStatus.OK).body(userFromSession);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
+                    ServerResponse("Error", "You not login"));
         }
     }
 
@@ -102,7 +103,8 @@ public class UserController {
             userForUpdate = userService.getUser(userFromSession.getEmail());
         } else {
             // если такой юзер не нашелся
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
+                    ServerResponse("Error", "You not login"));
         }
 
         // переместим значения ненулевых полей
