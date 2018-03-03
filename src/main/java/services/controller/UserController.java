@@ -16,9 +16,9 @@ import javax.validation.constraints.NotNull;
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
     private static final String SESSION_KEY = "SESSION_KEY";
-    private static final String ERROR_EMAIL = "Error email";
-    private static final String ERROR_PASSWORD = "Error password";
-    private static final String ERROR_NICKNAME = "Error nickname";
+    private static final String ERROR_EMAIL = "Empty email";
+    private static final String ERROR_PASSWORD = "Empty password";
+    private static final String ERROR_NICKNAME = "Empty nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
 
     @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
@@ -60,7 +60,7 @@ public class UserController {
         if (errorString.length() > 0) {
             response.setStatus("Error");
             response.setMessage(errorString.toString());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
         if (userService.register(user)) {
@@ -74,8 +74,8 @@ public class UserController {
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
             response.setStatus("Error");
-            response.setMessage("Invalid parameters");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            response.setMessage("Unsuccessful registration");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 
@@ -92,7 +92,7 @@ public class UserController {
 
 
     @PostMapping(value = "/user/update")
-    public ResponseEntity<String> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
+    public ResponseEntity<ServerResponse> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
         // попробуем найти уже существующие данные
         // о юзере которому хотим обновить данные
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
@@ -120,10 +120,11 @@ public class UserController {
 
         // обновляем данные если все хорошо
         if (userService.updateUser(userForUpdate)) {
-            final ServerResponse response = new ServerResponse("Ok", "Successful update");
-            return ResponseEntity.status(HttpStatus.OK).body(response.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(new
+                    ServerResponse("Ok", "Successful update"));
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new
+                    ServerResponse("Error", "Unsuccessful update"));
         }
 
     }
