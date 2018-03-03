@@ -123,7 +123,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new
                     ServerResponse("Ok", "Successful update"));
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
                     ServerResponse("Error", "Unsuccessful update"));
         }
 
@@ -172,7 +172,7 @@ public class UserController {
         } else {
             response.setStatus("Error");
             response.setMessage("Unsuccessful logout");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }
