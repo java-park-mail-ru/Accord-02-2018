@@ -34,14 +34,14 @@ public class UserController {
     }
 
 
-    @GetMapping(value = "/connection")
-    public ResponseEntity<ServerResponse> connection() {
+    @GetMapping(value = "/connection", produces = "application/json")
+    public ResponseEntity<?> connection() {
         return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("OK",
                 "Congratulations, its successful connection"));
     }
 
-    @PostMapping(value = "/user/register", produces = "application/json")
-    public ResponseEntity<ServerResponse> register(@RequestBody @NotNull User user, HttpSession httpSession) {
+    @PostMapping(value = "/register", produces = "application/json")
+    public ResponseEntity<?> register(@RequestBody @NotNull User user, HttpSession httpSession) {
         final ServerResponse response = new ServerResponse();
         final StringBuilder errorString = new StringBuilder();
 
@@ -79,21 +79,22 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/user/get")
+    @GetMapping(value = "/getUser", produces = "application/json")
     public ResponseEntity<?> getUser(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
         if (userFromSession != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(userFromSession);
+            final User userForReturn = userService.getUser(userFromSession.getEmail());
+            return ResponseEntity.status(HttpStatus.OK).body(userForReturn);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
-                    ServerResponse("Error", "You not login"));
+                    ServerResponse("Error", "You are not login"));
         }
     }
 
 
-    @PostMapping(value = "/user/update")
-    public ResponseEntity<ServerResponse> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
+    @PostMapping(value = "/updateUser", produces = "application/json")
+    public ResponseEntity<?> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
         // попробуем найти уже существующие данные
         // о юзере которому хотим обновить данные
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
@@ -104,7 +105,7 @@ public class UserController {
         } else {
             // если такой юзер не нашелся
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
-                    ServerResponse("Error", "You not login"));
+                    ServerResponse("Error", "You are not login"));
         }
 
         // переместим значения ненулевых полей
@@ -131,8 +132,8 @@ public class UserController {
 
     }
 
-    @PostMapping(value = "/login")
-    public ResponseEntity<ServerResponse> login(@RequestBody User userToLogin, HttpSession httpSession) {
+    @PostMapping(value = "/login", produces = "application/json")
+    public ResponseEntity<?> login(@RequestBody User userToLogin, HttpSession httpSession) {
         final StringBuilder errorString = new StringBuilder();
 
 
@@ -161,8 +162,8 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/logout")
-    public ResponseEntity<ServerResponse> logout(HttpSession httpSession) {
+    @PostMapping(value = "/logout", produces = "application/json")
+    public ResponseEntity<?> logout(HttpSession httpSession) {
         final ServerResponse response = new ServerResponse();
 
         if (httpSession.getAttribute(SESSION_KEY) != null) {

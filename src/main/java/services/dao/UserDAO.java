@@ -47,9 +47,13 @@ public class UserDAO {
         return false;
     }
 
-    public User getUser(@NotNull String email) throws DataAccessException {
-        final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
-        return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
+    public User getUser(@NotNull String email) {
+        try {
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
+            return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
+        } catch (DataAccessException e) {
+            return null;
+        }
     }
 
     public Boolean updateUser(@NotNull User userToUpdate) {
@@ -105,6 +109,7 @@ public class UserDAO {
             user.setEmail(resultSet.getString("email"));
             user.setNickname(resultSet.getString("nickname"));
             user.setPassword(resultSet.getString("password"));
+            user.setRating(resultSet.getInt("rating"));
 
             return user;
         }
