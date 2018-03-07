@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import services.dao.UserInfoDAO;
 import services.model.ScoreBoard;
+import services.model.ServerResponse;
 import services.model.UserInfo;
 
 import javax.validation.constraints.NotNull;
@@ -25,7 +26,7 @@ public class ScoreBoardController {
 
 
     @PostMapping(path = "/scoreboard/{page}")
-    public ResponseEntity<ScoreBoard> getLeaders(@PathVariable("page") @NotNull Integer page) {
+    public ResponseEntity<?> getLeaders(@PathVariable("page") @NotNull Integer page) {
         final int numberOfPages = userInfoService.getLastPage(USER_PER_PAGE);
 
         if (page == null || page < 1) {
@@ -37,7 +38,12 @@ public class ScoreBoardController {
         }
 
         final List<UserInfo> userInfoList = userInfoService.getSortedUsersInfoByRating(USER_PER_PAGE, page);
-        final ScoreBoard scoreBoardResponse = new ScoreBoard(page, numberOfPages, userInfoList);
-        return ResponseEntity.status(HttpStatus.OK).body(scoreBoardResponse);
+        if (userInfoList != null) {
+            final ScoreBoard scoreBoardResponse = new ScoreBoard(page, numberOfPages, userInfoList);
+            return ResponseEntity.status(HttpStatus.OK).body(scoreBoardResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse(
+                    "Error", "Unsuccessful try"));
+        }
     }
 }
