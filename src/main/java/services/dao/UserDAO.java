@@ -101,6 +101,24 @@ public class UserDAO {
         return false;
     }
 
+    public List<User> getSortedUsersByRating(int userPerPage, int page) {
+        try {
+            int offset = (page - 1) * userPerPage;
+            final String sql = "SELECT * FROM \"User\" ORDER BY rating DESC LIMIT ? OFFSET ?;";
+            return jdbcTemplate.query(sql, new Object[]{userPerPage, offset}, new UserMapper());
+        } catch (DataAccessException e) {
+            return null;
+        }
+    }
+
+    public int getLastPage(int userPerPage) {
+        try {
+            int numberOfUsers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM \"User\";", Integer.class);
+            return numberOfUsers / userPerPage + 1;
+        } catch (DataAccessException e) {
+            return 0;
+        }
+    }
 
     public static class UserMapper implements RowMapper<User> {
         @Override
