@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import services.dao.UserDAO;
-import services.model.ScoreBoard;
 import services.model.ServerResponse;
 import services.model.User;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
+
+@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
@@ -22,11 +22,11 @@ public class UserController {
     private static final String ERROR_PASSWORD = "Empty password";
     private static final String ERROR_NICKNAME = "Empty nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
-    private static final int USER_PER_PAGE = 10;
 
     @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
     private final UserDAO userService = new UserDAO();
+
 
     private boolean isEmptyField(String field) {
         return ((field == null) || field.isEmpty());
@@ -78,7 +78,7 @@ public class UserController {
         }
     }
 
-    //TODO rewrite by using userprofile
+
     @GetMapping(value = "/getUser", produces = "application/json")
     public ResponseEntity<?> getUser(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
@@ -176,23 +176,5 @@ public class UserController {
             response.setMessage("Unsuccessful logout");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-    }
-
-    //TODO rewrite by using userprofile
-    @PostMapping(path = "/scoreboard/{page}")
-    public ResponseEntity<ScoreBoard> getLeaders(@PathVariable("page") @NotNull Integer page) {
-        final int numberOfPages = userService.getLastPage(USER_PER_PAGE);
-
-        if (page == null || page < 1) {
-            page = 1;
-        } else {
-            if (page > numberOfPages) {
-                page = numberOfPages;
-            }
-        }
-
-        final List<User> userList = userService.getSortedUsersByRating(USER_PER_PAGE, page);
-        final ScoreBoard scoreBoardResponse = new ScoreBoard(page, numberOfPages, userList);
-        return ResponseEntity.status(HttpStatus.OK).body(scoreBoardResponse);
     }
 }

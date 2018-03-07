@@ -5,7 +5,7 @@ import java.util.List;
 public class ScoreBoard {
     private int currentPage;
     private int numberOfPages;
-    private List<User> scoreBoard;
+    private List<UserInfo> scoreBoard;
 
     @SuppressWarnings("unused")
     public ScoreBoard() {
@@ -14,7 +14,7 @@ public class ScoreBoard {
         this.scoreBoard = null;
     }
 
-    public ScoreBoard(int currentPage, int numberOfPages, List<User> usersList) {
+    public ScoreBoard(int currentPage, int numberOfPages, List<UserInfo> usersList) {
         this.currentPage = currentPage;
         this.numberOfPages = numberOfPages;
         this.scoreBoard = usersList;
@@ -31,7 +31,7 @@ public class ScoreBoard {
     }
 
     @SuppressWarnings("unused")
-    public List<User> getScoreBoard() {
+    public List<UserInfo> getScoreBoard() {
         return this.scoreBoard;
     }
 
@@ -46,7 +46,7 @@ public class ScoreBoard {
     }
 
     @SuppressWarnings("unused")
-    public void setScoreBoard(List<User> newListUser) {
-        this.scoreBoard = newListUser;
+    public void setScoreBoard(List<UserInfo> newListUserInfo) {
+        this.scoreBoard = newListUserInfo;
     }
 }
