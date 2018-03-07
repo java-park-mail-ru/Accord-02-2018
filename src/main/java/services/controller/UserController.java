@@ -42,7 +42,6 @@ public class UserController {
 
     @PostMapping(value = "/register", produces = "application/json")
     public ResponseEntity<?> register(@RequestBody @NotNull User user, HttpSession httpSession) {
-        final ServerResponse response = new ServerResponse();
         final StringBuilder errorString = new StringBuilder();
 
         if (isEmptyField(user.getEmail())) {
@@ -58,24 +57,21 @@ public class UserController {
         }
 
         if (errorString.length() > 0) {
-            response.setStatus("Error");
-            response.setMessage(errorString.toString());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+                    errorString.toString()));
         }
 
         if (userService.register(user)) {
             httpSession.setAttribute(SESSION_KEY, user);
 
-            response.setStatus("Ok");
-            response.setMessage("Successful registration");
-            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse());
+            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok",
+                    "Successful registration"));
         } else {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
-            response.setStatus("Error");
-            response.setMessage("Unsuccessful registration");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+                    "Unsuccessful registration"));
         }
     }
 
