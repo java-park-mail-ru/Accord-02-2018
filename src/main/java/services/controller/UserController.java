@@ -44,18 +44,18 @@ public class UserController {
     }
 
     @PostMapping(value = "/register", produces = "application/json")
-    public ResponseEntity<?> register(@RequestBody @NotNull User user, HttpSession httpSession) {
+    public ResponseEntity<?> register(@RequestBody @NotNull User userToRegister, HttpSession httpSession) {
         final StringBuilder errorString = new StringBuilder();
 
-        if (isEmptyField(user.getEmail())) {
+        if (isEmptyField(userToRegister.getEmail())) {
             errorString.append(ERROR_EMAIL);
         }
 
-        if (isEmptyField(user.getPassword())) {
+        if (isEmptyField(userToRegister.getPassword())) {
             errorString.append(' ' + ERROR_PASSWORD);
         }
 
-        if (isEmptyField(user.getNickname())) {
+        if (isEmptyField(userToRegister.getNickname())) {
             errorString.append(' ' + ERROR_NICKNAME);
         }
 
@@ -64,11 +64,11 @@ public class UserController {
                     errorString.toString()));
         }
 
-        if (userService.register(user)) {
-            httpSession.setAttribute(SESSION_KEY, user);
+        if (userService.register(userToRegister)) {
+            final User userForSession = userService.getUser(userToRegister.getEmail());
+            httpSession.setAttribute(SESSION_KEY, userForSession);
 
-            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok",
-                    "Successful registration"));
+            return ResponseEntity.status(HttpStatus.OK).body(userForSession);
         } else {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
@@ -151,10 +151,10 @@ public class UserController {
         }
 
         if (userService.login(userToLogin)) {
-            httpSession.setAttribute(SESSION_KEY, userToLogin);
+            final User userForSession = userService.getUser(userToLogin.getEmail());
+            httpSession.setAttribute(SESSION_KEY, userForSession);
 
-            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok",
-                    "Successful login"));
+            return ResponseEntity.status(HttpStatus.OK).body(userForSession);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
                     "Invalid email or password"));
