@@ -30,7 +30,7 @@ public class UserDAO {
             return false;
         }
     }
-    
+
     public Boolean login(@NotNull User userToLogin) {
         try {
             final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
@@ -104,6 +104,7 @@ public class UserDAO {
         @Override
         public User mapRow(ResultSet resultSet, int incParam) throws SQLException {
             final User user = new User();
+            user.setId(resultSet.getLong("id"));
             user.setEmail(resultSet.getString("email"));
             user.setNickname(resultSet.getString("nickname"));
             user.setPassword(resultSet.getString("password"));

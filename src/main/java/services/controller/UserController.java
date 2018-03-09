@@ -65,10 +65,9 @@ public class UserController {
         }
 
         if (userService.register(userToRegister)) {
-            final User userForSession = userService.getUser(userToRegister.getEmail());
-            httpSession.setAttribute(SESSION_KEY, userForSession);
+            httpSession.setAttribute(SESSION_KEY, userToRegister);
 
-            return ResponseEntity.status(HttpStatus.OK).body(userForSession);
+            return ResponseEntity.status(HttpStatus.OK).body(userToRegister);
         } else {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
@@ -93,7 +92,7 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/updateUser", produces = "application/json")
+    @PutMapping(value = "/updateUser", produces = "application/json")
     public ResponseEntity<?> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
         // попробуем найти уже существующие данные
         // о юзере которому хотим обновить данные
@@ -161,7 +160,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(value = "/logout", produces = "application/json")
+    @DeleteMapping(value = "/logout", produces = "application/json")
     public ResponseEntity<?> logout(HttpSession httpSession) {
         final ServerResponse response = new ServerResponse();
 
