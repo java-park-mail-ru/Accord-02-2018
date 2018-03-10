@@ -10,17 +10,16 @@ import services.model.ServerResponse;
 import services.model.User;
 
 import javax.servlet.http.HttpSession;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 
-import static services.Application.pathAvatarsFolder;
+import static services.Application.PATH_AVATARS_FOLDER;
 import static services.controller.UserController.SESSION_KEY;
 
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class AvatarUploadController {
 
+    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
     private final UserDAO userService = new UserDAO();
 
@@ -38,20 +37,21 @@ public class AvatarUploadController {
         }
     }
 
+    @SuppressWarnings({"OverlyBroadCatchBlock", "ConstantConditions", "IOResourceOpenedButNotSafelyClosed"})
     @PostMapping(value = "/upload/avatar")
     public ResponseEntity<?> handleFileUpload(@RequestParam("avatar") MultipartFile file, HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
-        String oldFileName = file.getOriginalFilename();
-        String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
+        final String oldFileName = file.getOriginalFilename();
+        final String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
         final String nameFile = userFromSession.getId() + '.' + typeOfAvatar;
 
 
         if (userFromSession != null) {
             if (!file.isEmpty()) {
                 try {
-                    byte[] bytes = file.getBytes();
-                    BufferedOutputStream stream = new BufferedOutputStream(
-                            new FileOutputStream(new File(pathAvatarsFolder, nameFile)));
+                    final byte[] bytes = file.getBytes();
+                    @SuppressWarnings("resource") final BufferedOutputStream stream = new BufferedOutputStream(
+                            new FileOutputStream(new File(PATH_AVATARS_FOLDER, nameFile)));
                     stream.write(bytes);
                     stream.close();
 
@@ -59,7 +59,7 @@ public class AvatarUploadController {
                     if (userService.updateAvatar(userFromSession)) {
                         return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok", "Successful loading"));
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Unsuccessful loading"));
                 }
             }

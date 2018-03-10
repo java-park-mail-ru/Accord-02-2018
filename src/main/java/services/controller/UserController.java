@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import java.io.*;
 
-import static services.Application.pathAvatarsFolder;
+import static services.Application.PATH_AVATARS_FOLDER;
 
 
 @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
@@ -41,6 +41,7 @@ public class UserController {
     private boolean isValidField(Integer field) {
         return ((field != null) && (field >= 0));
     }
+
 
     @GetMapping(value = "/connection", produces = "application/json")
     public ResponseEntity<?> connection() {
@@ -97,14 +98,15 @@ public class UserController {
         }
     }
 
-
     @GetMapping(value = "/avatar/{id}")
     public void getAvatar(@PathVariable("id") String id, HttpServletResponse response) {
-        File imageForReturn = new File(pathAvatarsFolder, id + ".jpg");
+        @SuppressWarnings("TooBroadScope") final File imageForReturn = new File(PATH_AVATARS_FOLDER, id + ".jpg");
 
+        //noinspection OverlyBroadCatchBlock
         try {
-            InputStream in = new FileInputStream(imageForReturn);
+            final InputStream in = new FileInputStream(imageForReturn);
 
+            //noinspection ConstantConditions
             if (in != null) {
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);
                 response.setStatus(HttpServletResponse.SC_OK);
