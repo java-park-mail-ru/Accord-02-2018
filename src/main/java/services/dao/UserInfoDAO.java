@@ -42,6 +42,7 @@ public class UserInfoDAO {
             final UserInfo userInfo = new UserInfo();
             userInfo.setNickname(resultSet.getString("nickname"));
             userInfo.setRating(resultSet.getInt("rating"));
+            userInfo.setAvatar(resultSet.getString("avatar"));
 
             return userInfo;
         }

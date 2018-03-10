@@ -3,6 +3,8 @@ package services.model;
 public class UserInfo {
     private String nickname;
     private Integer rating;
+    private String avatar;
+
 
     @SuppressWarnings("unused")
     public UserInfo(String nickname, Integer rating) {
@@ -30,6 +32,10 @@ public class UserInfo {
         return rating;
     }
 
+    @SuppressWarnings("unused")
+    public String getAvatar() {
+        return avatar;
+    }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
@@ -37,5 +43,9 @@ public class UserInfo {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
