@@ -3,14 +3,12 @@ package services.controller;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.web.context.ServletContextAware;
 import services.dao.UserDAO;
 import services.model.ServerResponse;
 import services.model.User;
 import org.springframework.web.bind.annotation.*;
 
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
