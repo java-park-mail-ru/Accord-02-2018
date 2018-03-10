@@ -8,6 +8,7 @@ public class User {
     private String password;
     private String nickname;
     private Integer rating;
+    private String avatar;
 
     public User(String nickname, String email, String password, Integer rating) {
         this.nickname = nickname;
@@ -48,6 +49,10 @@ public class User {
         return rating;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
 
     public void setId(long id) {
         this.id = id;
@@ -67,5 +72,13 @@ public class User {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public void setDefaultAvatar(){
+        this.avatar = "default";
     }
 }

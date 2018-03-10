@@ -56,10 +56,12 @@ public class UserDAO {
     }
 
     public Boolean updateUser(@NotNull User userToUpdate) {
+        //TODO дописать под hasAvatarLink!
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
         final Boolean hasNickname = userToUpdate.getNickname() != null && !userToUpdate.getNickname().isEmpty();
         final Boolean hasRating = userToUpdate.getRating() != null && userToUpdate.getRating() >= 0;
-        final Boolean condition = hasNickname || hasPassword || hasRating;
+        final Boolean hasAvatarLink = userToUpdate.getAvatar() != null && !userToUpdate.getAvatar().isEmpty();
+        final Boolean condition = hasNickname || hasPassword || hasRating || hasAvatarLink;
 
         if (condition) {
             final List<Object> sqlParameters = new ArrayList<>();
@@ -100,6 +102,23 @@ public class UserDAO {
         return false;
     }
 
+    public Boolean updateAvatar(@NotNull User userToUpdate) {
+        final Boolean hasAvatarLink = userToUpdate.getAvatar() != null && !userToUpdate.getAvatar().isEmpty();
+
+        if (hasAvatarLink) {
+            try {
+                jdbcTemplate.update("UPDATE \"User\" SET avatar = ?::citext WHERE email = ?::citext;",
+                        new Object[]{userToUpdate.getAvatar(), userToUpdate.getEmail()});
+                return true;
+            } catch (DataAccessException e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+
     public static class UserMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet resultSet, int incParam) throws SQLException {
@@ -109,6 +128,7 @@ public class UserDAO {
             user.setNickname(resultSet.getString("nickname"));
             user.setPassword(resultSet.getString("password"));
             user.setRating(resultSet.getInt("rating"));
+            user.setAvatar(resultSet.getString("avatar"));
 
             return user;
         }

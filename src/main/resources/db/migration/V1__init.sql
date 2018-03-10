@@ -1,3 +1,5 @@
+DROP TABLE "User";
+
 CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE "User" (
@@ -5,5 +7,6 @@ CREATE TABLE "User" (
   email CITEXT COLLATE "ucs_basic" UNIQUE NOT NULL,
   password VARCHAR(256) NOT NULL,
   nickname CITEXT COLLATE "ucs_basic" UNIQUE NOT NULL,
-  rating INTEGER DEFAULT 0
+  rating INTEGER DEFAULT 0,
+  avatar CITEXT COLLATE "ucs_basic" UNIQUE NOT NULL DEFAULT 'default.jpg'
 );

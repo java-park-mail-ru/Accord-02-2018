@@ -1,23 +1,29 @@
 package services.controller;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.web.context.ServletContextAware;
 import services.dao.UserDAO;
 import services.model.ServerResponse;
 import services.model.User;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
+import java.io.*;
+
+import static services.Application.pathAvatarsFolder;
 
 
 @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
-    private static final String SESSION_KEY = "SESSION_KEY";
+    public static final String SESSION_KEY = "SESSION_KEY";
     private static final String ERROR_EMAIL = "Empty email";
     private static final String ERROR_PASSWORD = "Empty password";
     private static final String ERROR_NICKNAME = "Empty nickname";
@@ -35,7 +41,6 @@ public class UserController {
     private boolean isValidField(Integer field) {
         return ((field != null) && (field >= 0));
     }
-
 
     @GetMapping(value = "/connection", produces = "application/json")
     public ResponseEntity<?> connection() {
@@ -65,9 +70,10 @@ public class UserController {
         }
 
         if (userService.register(userToRegister)) {
-            httpSession.setAttribute(SESSION_KEY, userToRegister);
+            final User userForSession = userService.getUser(userToRegister.getEmail());
+            httpSession.setAttribute(SESSION_KEY, userForSession);
 
-            return ResponseEntity.status(HttpStatus.OK).body(userToRegister);
+            return ResponseEntity.status(HttpStatus.OK).body(userForSession);
         } else {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
@@ -91,6 +97,25 @@ public class UserController {
         }
     }
 
+
+    @GetMapping(value = "/avatar/{id}")
+    public void getAvatar(@PathVariable("id") String id, HttpServletResponse response) {
+        File imageForReturn = new File(pathAvatarsFolder, id + ".jpg");
+
+        try {
+            InputStream in = new FileInputStream(imageForReturn);
+
+            if (in != null) {
+                response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+                response.setStatus(HttpServletResponse.SC_OK);
+                IOUtils.copy(in, response.getOutputStream());
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 
     @PutMapping(value = "/updateUser", produces = "application/json")
     public ResponseEntity<?> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
@@ -162,18 +187,11 @@ public class UserController {
 
     @DeleteMapping(value = "/logout", produces = "application/json")
     public ResponseEntity<?> logout(HttpSession httpSession) {
-        final ServerResponse response = new ServerResponse();
-
         if (httpSession.getAttribute(SESSION_KEY) != null) {
             httpSession.invalidate();
-
-            response.setStatus("Ok");
-            response.setMessage("Successful logout");
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok", "Successful logout"));
         } else {
-            response.setStatus("Error");
-            response.setMessage("Unsuccessful logout");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Unsuccessful logout"));
         }
     }
 }
