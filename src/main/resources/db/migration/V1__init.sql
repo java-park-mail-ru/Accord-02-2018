@@ -6,5 +6,5 @@ CREATE TABLE "User" (
   password VARCHAR(256) NOT NULL,
   nickname CITEXT COLLATE "ucs_basic" UNIQUE NOT NULL,
   rating INTEGER DEFAULT 0,
-  avatar CITEXT COLLATE "ucs_basic" UNIQUE NOT NULL DEFAULT 'default.jpg'
+  avatar CITEXT COLLATE "ucs_basic" NOT NULL DEFAULT 'default.jpg'
 );
