@@ -43,8 +43,7 @@ public class AvatarUploadController {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
         final String oldFileName = file.getOriginalFilename();
         final String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
-        final String nameFile = String.valueOf(userFromSession.getId()) + '.' + typeOfAvatar;
-
+        final String nameFile = String.valueOf(userFromSession.getId()) + typeOfAvatar;
 
         if (userFromSession != null) {
             if (!file.isEmpty()) {
