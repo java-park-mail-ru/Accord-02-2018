@@ -13,18 +13,18 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 
 import static services.Application.PATH_AVATARS_FOLDER;
-import static services.controller.UserController.SESSION_KEY;
 
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class AvatarUploadController {
+    private static final String SESSION_KEY = "SESSION_KEY";
 
     @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
     private final UserDAO userService = new UserDAO();
 
 
-    @GetMapping(value = "/upload/avatar")
+    @GetMapping(value = "/updateAvatar")
     public ResponseEntity<?> provideUploadInfo(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
@@ -38,12 +38,12 @@ public class AvatarUploadController {
     }
 
     @SuppressWarnings({"OverlyBroadCatchBlock", "ConstantConditions", "IOResourceOpenedButNotSafelyClosed"})
-    @PostMapping(value = "/upload/avatar")
+    @PostMapping(value = "/updateAvatar")
     public ResponseEntity<?> handleFileUpload(@RequestParam("avatar") MultipartFile file, HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
         final String oldFileName = file.getOriginalFilename();
         final String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
-        final String nameFile = userFromSession.getId() + '.' + typeOfAvatar;
+        final String nameFile = String.valueOf(userFromSession.getId()) + '.' + typeOfAvatar;
 
 
         if (userFromSession != null) {

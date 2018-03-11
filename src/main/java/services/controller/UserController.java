@@ -21,7 +21,7 @@ import static services.Application.PATH_AVATARS_FOLDER;
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
-    public static final String SESSION_KEY = "SESSION_KEY";
+    private static final String SESSION_KEY = "SESSION_KEY";
     private static final String ERROR_EMAIL = "Empty email";
     private static final String ERROR_PASSWORD = "Empty password";
     private static final String ERROR_NICKNAME = "Empty nickname";
@@ -96,9 +96,9 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/avatar/{id}")
-    public void getAvatar(@PathVariable("id") String id, HttpServletResponse response) {
-        @SuppressWarnings("TooBroadScope") final File imageForReturn = new File(PATH_AVATARS_FOLDER, id + ".jpg");
+    @GetMapping(value = "/avatar/{avatar:.+}")
+    public void getAvatar(@PathVariable("avatar") String avatar, HttpServletResponse response) {
+        @SuppressWarnings("TooBroadScope") final File imageForReturn = new File(PATH_AVATARS_FOLDER, avatar);
 
         //noinspection OverlyBroadCatchBlock
         try {
