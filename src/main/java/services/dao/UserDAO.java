@@ -56,12 +56,10 @@ public class UserDAO {
     }
 
     public Boolean updateUser(@NotNull User userToUpdate) {
-        //TODO дописать под hasAvatarLink!
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
         final Boolean hasNickname = userToUpdate.getNickname() != null && !userToUpdate.getNickname().isEmpty();
         final Boolean hasRating = userToUpdate.getRating() != null && userToUpdate.getRating() >= 0;
-        final Boolean hasAvatarLink = userToUpdate.getAvatar() != null && !userToUpdate.getAvatar().isEmpty();
-        final Boolean condition = hasNickname || hasPassword || hasRating || hasAvatarLink;
+        final Boolean condition = hasNickname || hasPassword || hasRating;
 
         if (condition) {
             final List<Object> sqlParameters = new ArrayList<>();

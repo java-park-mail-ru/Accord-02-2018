@@ -122,38 +122,34 @@ public class UserController {
         // попробуем найти уже существующие данные
         // о юзере которому хотим обновить данные
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
-        final User userForUpdate;
 
         if (userFromSession != null) {
-            userForUpdate = userService.getUser(userFromSession.getEmail());
+            // переместим значения ненулевых полей
+            if (isValidField(updateData.getRating())) {
+                userFromSession.setRating(updateData.getRating());
+            }
+
+            if (!isEmptyField(updateData.getPassword())) {
+                userFromSession.setPassword(updateData.getPassword());
+            }
+
+            if (!isEmptyField(updateData.getNickname())) {
+                userFromSession.setNickname(updateData.getNickname());
+            }
+
+            // обновляем данные если все хорошо
+            if (userService.updateUser(userFromSession)) {
+                return ResponseEntity.status(HttpStatus.OK).body(new
+                        ServerResponse("Ok", "Successful update"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
+                        ServerResponse("Error", "Unsuccessful update"));
+            }
         } else {
             // если такой юзер не нашелся
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
                     ServerResponse("Error", "You are not login"));
         }
-
-        // переместим значения ненулевых полей
-        if (isValidField(updateData.getRating())) {
-            userForUpdate.setRating(updateData.getRating());
-        }
-
-        if (!isEmptyField(updateData.getPassword())) {
-            userForUpdate.setPassword(updateData.getPassword());
-        }
-
-        if (!isEmptyField(updateData.getNickname())) {
-            userForUpdate.setNickname(updateData.getNickname());
-        }
-
-        // обновляем данные если все хорошо
-        if (userService.updateUser(userForUpdate)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new
-                    ServerResponse("Ok", "Successful update"));
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
-                    ServerResponse("Error", "Unsuccessful update"));
-        }
-
     }
 
     @PostMapping(value = "/login", produces = "application/json")
