@@ -1,16 +1,18 @@
 package services.controller;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import services.dao.UserInfoDAO;
+import services.dao.UserDAO;
 import services.model.ScoreBoard;
 import services.model.ServerResponse;
-import services.model.UserInfo;
+import services.model.User;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+
 
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
@@ -19,12 +21,12 @@ public class ScoreBoardController {
 
     @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
-    private final UserInfoDAO userInfoService = new UserInfoDAO();
+    private final UserDAO userService = new UserDAO();
 
 
     @GetMapping(path = "/scoreboard/{page}")
     public ResponseEntity<?> getLeaders(@PathVariable("page") @NotNull Integer page) {
-        final int numberOfPages = userInfoService.getLastPage(USER_PER_PAGE);
+        final int numberOfPages = userService.getLastPage(USER_PER_PAGE);
 
         if (page == null || page < 1) {
             page = 1;
@@ -34,7 +36,7 @@ public class ScoreBoardController {
             }
         }
 
-        final List<UserInfo> userInfoList = userInfoService.getSortedUsersInfoByRating(USER_PER_PAGE, page);
+        final List<User> userInfoList = userService.getSortedUsersInfoByRating(USER_PER_PAGE, page);
         if (userInfoList != null) {
             final ScoreBoard scoreBoardResponse = new ScoreBoard(page, numberOfPages, userInfoList);
             return ResponseEntity.status(HttpStatus.OK).body(scoreBoardResponse);

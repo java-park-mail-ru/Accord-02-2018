@@ -14,10 +14,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 @Repository
 public class UserDAO {
 
+    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -55,6 +55,7 @@ public class UserDAO {
         }
     }
 
+    @SuppressWarnings({"OverlyComplexMethod", "SingleCharacterStringConcatenation"})
     public Boolean updateUser(@NotNull User userToUpdate) {
         final Boolean hasPassword = userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty();
         final Boolean hasNickname = userToUpdate.getNickname() != null && !userToUpdate.getNickname().isEmpty();
@@ -63,7 +64,7 @@ public class UserDAO {
 
         if (condition) {
             final List<Object> sqlParameters = new ArrayList<>();
-            StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
+            final StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
 
             if (hasNickname) {
                 sql.append(" nickname = ?::citext");
@@ -100,6 +101,7 @@ public class UserDAO {
         return false;
     }
 
+    @SuppressWarnings("RedundantArrayCreation")
     public Boolean updateAvatar(@NotNull User userToUpdate) {
         final Boolean hasAvatarLink = userToUpdate.getAvatar() != null && !userToUpdate.getAvatar().isEmpty();
 
@@ -116,6 +118,25 @@ public class UserDAO {
         return false;
     }
 
+    public List<User> getSortedUsersInfoByRating(int userPerPage, int page) {
+        try {
+            final int offset = (page - 1) * userPerPage;
+            final String sql = "SELECT * FROM \"User\" ORDER BY rating DESC LIMIT ? OFFSET ?;";
+            return jdbcTemplate.query(sql, new Object[]{userPerPage, offset}, new UserInfoMapper());
+        } catch (DataAccessException e) {
+            return null;
+        }
+    }
+
+    public int getLastPage(int userPerPage) {
+        try {
+            final int numberOfUsers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM \"User\";", Integer.class);
+            return numberOfUsers / userPerPage + 1;
+        } catch (DataAccessException e) {
+            return 0;
+        }
+    }
+
 
     public static class UserMapper implements RowMapper<User> {
         @Override
@@ -125,6 +146,19 @@ public class UserDAO {
             user.setEmail(resultSet.getString("email"));
             user.setNickname(resultSet.getString("nickname"));
             user.setPassword(resultSet.getString("password"));
+            user.setRating(resultSet.getInt("rating"));
+            user.setAvatar(resultSet.getString("avatar"));
+
+            return user;
+        }
+    }
+
+    public static class UserInfoMapper implements RowMapper<User> {
+        @Override
+        public User mapRow(ResultSet resultSet, int incParam) throws SQLException {
+            final User user = new User();
+            user.setId(resultSet.getLong("id"));
+            user.setNickname(resultSet.getString("nickname"));
             user.setRating(resultSet.getInt("rating"));
             user.setAvatar(resultSet.getString("avatar"));
 
