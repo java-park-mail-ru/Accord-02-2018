@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-public class UserServiceTest {
+public class UserDAOTest {
     private static final String LOGIN = "example_login";
     private static final String LOGIN_FIRST = "example_login_1";
     private static final String LOGIN_SECOND = "example_login_2";

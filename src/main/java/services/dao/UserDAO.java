@@ -20,7 +20,6 @@ public class UserDAO {
     @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private static final int USER_PER_PAGE = 10;
 
     public Boolean register(@NotNull User userToRegister) {
         try {
@@ -131,10 +130,6 @@ public class UserDAO {
 
     public int getLastPage(int userPerPage) {
         try {
-            if (userPerPage <= 0) {
-                userPerPage = USER_PER_PAGE;
-            }
-
             final int numberOfUsers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM \"User\";", Integer.class);
             return numberOfUsers / userPerPage + 1;
         } catch (DataAccessException e) {
@@ -162,7 +157,6 @@ public class UserDAO {
         @Override
         public User mapRow(ResultSet resultSet, int incParam) throws SQLException {
             final User user = new User();
-            user.setId(resultSet.getLong("id"));
             user.setNickname(resultSet.getString("nickname"));
             user.setRating(resultSet.getInt("rating"));
             user.setAvatar(resultSet.getString("avatar"));

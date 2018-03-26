@@ -15,7 +15,6 @@ public class User {
         this.password = password;
         this.email = email;
         this.rating = rating;
-        this.avatar = "default.jpg";
     }
 
     public User(User user) {
@@ -24,7 +23,6 @@ public class User {
         this.password = user.password;
         this.email = user.email;
         this.rating = user.rating;
-        this.avatar = user.avatar;
     }
 
     public User() {
