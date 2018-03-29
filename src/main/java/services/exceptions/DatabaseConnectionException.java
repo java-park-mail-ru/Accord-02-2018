@@ -7,8 +7,8 @@ import javax.validation.constraints.NotNull;
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 public class DatabaseConnectionException extends RuntimeException {
-    public DatabaseConnectionException(@NotNull String errorMessage) {
-        super(errorMessage);
+    public DatabaseConnectionException(@NotNull String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
     }
 
     @SuppressWarnings("unused")
