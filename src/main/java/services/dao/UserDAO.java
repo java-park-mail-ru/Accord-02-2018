@@ -1,6 +1,7 @@
 package services.dao;
 
 
+import services.exceptions.DatabaseConnectionException;
 import services.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,7 +42,7 @@ public class UserDAO {
                 return true;
             }
         } catch (DataAccessException e) {
-            return false;
+            throw new DatabaseConnectionException("Can't connect to the database");
         }
 
         return false;
@@ -52,7 +53,7 @@ public class UserDAO {
             final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
-            return null;
+            throw new DatabaseConnectionException("Can't connect to the database");
         }
     }
 

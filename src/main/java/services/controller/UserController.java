@@ -3,6 +3,7 @@ package services.controller;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.*;
 import services.dao.UserDAO;
+import services.exceptions.DatabaseConnectionException;
 import services.model.ServerResponse;
 import services.model.User;
 import org.springframework.web.bind.annotation.*;
@@ -92,7 +93,14 @@ public class UserController {
                     ServerResponse("Error", "You are not login"));
         }
 
-        final User userForReturn = userService.getUser(userFromSession.getEmail());
+        final User userForReturn;
+        try {
+            userForReturn = userService.getUser(userFromSession.getEmail());
+        } catch (DatabaseConnectionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                    e.getMessage()));
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(userForReturn);
     }
 
@@ -165,9 +173,14 @@ public class UserController {
                     errorString.toString()));
         }
 
-        if (!userService.login(userToLogin)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
-                    "Invalid email or password"));
+        try {
+            if (!userService.login(userToLogin)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+                        "Invalid email or password"));
+            }
+        } catch (DatabaseConnectionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                    e.getMessage()));
         }
 
         final User userForSession = userService.getUser(userToLogin.getEmail());
