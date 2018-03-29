@@ -13,10 +13,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Repository
 public class UserDAO {
     private static JdbcTemplate jdbcTemplate;
+    private final Logger logger = Logger.getLogger(UserDAO.class.getName());
 
     public UserDAO(JdbcTemplate jdbcTemplate) {
         //noinspection AccessStaticViaInstance
@@ -42,6 +45,7 @@ public class UserDAO {
                 return true;
             }
         } catch (DataAccessException e) {
+            logger.log(Level.WARNING, "Exception : ", e);
             throw new DatabaseConnectionException("Can't connect to the database");
         }
 
@@ -53,6 +57,7 @@ public class UserDAO {
             final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
+            logger.log(Level.WARNING, "Exception : ", e);
             throw new DatabaseConnectionException("Can't connect to the database");
         }
     }
@@ -96,7 +101,8 @@ public class UserDAO {
                 jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
                 return true;
             } catch (DataAccessException e) {
-                return false;
+                logger.log(Level.WARNING, "Exception : ", e);
+                throw new DatabaseConnectionException("Can't connect to the database");
             }
         }
 

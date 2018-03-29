@@ -145,10 +145,14 @@ public class UserController {
         if (!isEmptyField(updateData.getNickname())) {
             userFromSession.setNickname(updateData.getNickname());
         }
-
-        if (!userService.updateUser(userFromSession)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
-                    ServerResponse("Error", "Unsuccessful update"));
+        try {
+            if (!userService.updateUser(userFromSession)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
+                        ServerResponse("Error", "Unsuccessful update"));
+            }
+        } catch (DatabaseConnectionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                    e.getMessage()));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(new
