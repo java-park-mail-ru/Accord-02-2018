@@ -2,7 +2,6 @@ package services.dao;
 
 
 import services.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,10 +15,12 @@ import java.util.List;
 
 @Repository
 public class UserDAO {
+    private static JdbcTemplate jdbcTemplate;
 
-    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public UserDAO(JdbcTemplate jdbcTemplate) {
+        //noinspection AccessStaticViaInstance
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public Boolean register(@NotNull User userToRegister) {
         try {

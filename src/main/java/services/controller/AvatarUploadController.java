@@ -1,9 +1,7 @@
 package services.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import services.dao.UserDAO;
@@ -21,7 +19,8 @@ public class AvatarUploadController {
     private static final String SESSION_KEY = "SESSION_KEY";
     private static UserDAO userService;
 
-    public AvatarUploadController(UserDAO userService){
+    @SuppressWarnings("AccessStaticViaInstance")
+    public AvatarUploadController(UserDAO userService) {
         this.userService = userService;
     }
 

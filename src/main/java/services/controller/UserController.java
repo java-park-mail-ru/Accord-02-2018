@@ -1,7 +1,6 @@
 package services.controller;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import services.dao.UserDAO;
 import services.model.ServerResponse;
@@ -17,7 +16,6 @@ import java.io.*;
 import static services.Application.PATH_AVATARS_FOLDER;
 
 
-@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
@@ -28,7 +26,8 @@ public class UserController {
     private static final int MAX_LENGTH_PASSWORD = 255;
     private static UserDAO userService;
 
-    public UserController(UserDAO userService){
+    @SuppressWarnings("AccessStaticViaInstance")
+    public UserController(UserDAO userService) {
         this.userService = userService;
     }
 

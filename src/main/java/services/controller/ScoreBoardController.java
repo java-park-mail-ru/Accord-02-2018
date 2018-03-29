@@ -1,7 +1,6 @@
 package services.controller;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +17,12 @@ import java.util.List;
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class ScoreBoardController {
     private static final int USER_PER_PAGE = 10;
+    private static UserDAO userService;
 
-    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
-    @Autowired
-    private final UserDAO userService = new UserDAO();
+    public ScoreBoardController(UserDAO userService) {
+        //noinspection AccessStaticViaInstance
+        this.userService = userService;
+    }
 
 
     @GetMapping(path = "/scoreboard/{page}")
