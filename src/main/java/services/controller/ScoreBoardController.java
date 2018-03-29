@@ -38,12 +38,12 @@ public class ScoreBoardController {
         }
 
         final List<User> userInfoList = userService.getSortedUsersInfoByRating(USER_PER_PAGE, page);
-        if (userInfoList != null) {
-            final ScoreBoard scoreBoardResponse = new ScoreBoard(page, numberOfPages, userInfoList);
-            return ResponseEntity.status(HttpStatus.OK).body(scoreBoardResponse);
-        } else {
+        if (userInfoList == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse(
                     "Error", "Unsuccessful try"));
         }
+
+        final ScoreBoard scoreBoardResponse = new ScoreBoard(page, numberOfPages, userInfoList);
+        return ResponseEntity.status(HttpStatus.OK).body(scoreBoardResponse);
     }
 }

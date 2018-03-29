@@ -50,6 +50,7 @@ public class UserDAO {
             throw new DatabaseConnectionException("Can't connect to the database");
         }
 
+
         return false;
     }
 
