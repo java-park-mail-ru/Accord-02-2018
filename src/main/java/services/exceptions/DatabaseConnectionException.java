@@ -11,6 +11,7 @@ public class DatabaseConnectionException extends RuntimeException {
         super(errorMessage);
     }
 
+    @SuppressWarnings("unused")
     DatabaseConnectionException(DatabaseConnectionException error) {
         super(error);
     }

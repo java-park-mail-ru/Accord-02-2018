@@ -46,6 +46,7 @@ public class UserDAO {
             }
         } catch (DataAccessException e) {
             logger.log(Level.WARNING, "Exception : ", e);
+            //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
             throw new DatabaseConnectionException("Can't connect to the database");
         }
 
@@ -58,6 +59,7 @@ public class UserDAO {
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
             logger.log(Level.WARNING, "Exception : ", e);
+            //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
             throw new DatabaseConnectionException("Can't connect to the database");
         }
     }
@@ -102,6 +104,7 @@ public class UserDAO {
                 return true;
             } catch (DataAccessException e) {
                 logger.log(Level.WARNING, "Exception : ", e);
+                //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
                 throw new DatabaseConnectionException("Can't connect to the database");
             }
         }
@@ -119,7 +122,9 @@ public class UserDAO {
                         new Object[]{userToUpdate.getAvatar(), userToUpdate.getEmail()});
                 return true;
             } catch (DataAccessException e) {
-                return false;
+                logger.log(Level.WARNING, "Exception : ", e);
+                //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
+                throw new DatabaseConnectionException("Can't connect to the database");
             }
         }
 

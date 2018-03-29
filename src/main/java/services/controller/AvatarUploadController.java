@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import services.dao.UserDAO;
+import services.exceptions.DatabaseConnectionException;
 import services.model.ServerResponse;
 import services.model.User;
 
@@ -46,27 +47,35 @@ public class AvatarUploadController {
         final String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
         final String nameFile = String.valueOf(userFromSession.getId()) + typeOfAvatar;
 
-        if (userFromSession != null) {
-            if (!file.isEmpty()) {
-                try {
-                    final byte[] bytes = file.getBytes();
-                    @SuppressWarnings("resource") final BufferedOutputStream stream = new BufferedOutputStream(
-                            new FileOutputStream(new File(PATH_AVATARS_FOLDER, nameFile)));
-                    stream.write(bytes);
-                    stream.close();
-
-                    userFromSession.setAvatar(nameFile);
-                    if (userService.updateAvatar(userFromSession)) {
-                        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok", "Successful loading"));
-                    }
-                } catch (IOException e) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Unsuccessful loading"));
-                }
-            }
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Bad file"));
-        } else {
+        if (userFromSession == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error", "You are not login"));
         }
+
+        if (!file.isEmpty()) {
+            try {
+                final byte[] bytes = file.getBytes();
+                @SuppressWarnings("resource") final BufferedOutputStream stream = new BufferedOutputStream(
+                        new FileOutputStream(new File(PATH_AVATARS_FOLDER, nameFile)));
+                stream.write(bytes);
+                stream.close();
+
+                userFromSession.setAvatar(nameFile);
+
+                try {
+                    if (!userService.updateAvatar(userFromSession)) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Bad file"));
+                    }
+                } catch (DatabaseConnectionException e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                            e.getMessage()));
+                }
+
+                return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok", "Successful loading"));
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Unsuccessful loading"));
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "File is empty"));
     }
 }
