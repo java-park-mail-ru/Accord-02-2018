@@ -3,10 +3,12 @@ package services.model;
 
 @SuppressWarnings("unused")
 public class User {
+    private long id;
     private String email;
     private String password;
     private String nickname;
     private Integer rating;
+    private String avatar;
 
     public User(String nickname, String email, String password, Integer rating) {
         this.nickname = nickname;
@@ -16,6 +18,7 @@ public class User {
     }
 
     public User(User user) {
+        this.id = user.id;
         this.nickname = user.nickname;
         this.password = user.password;
         this.email = user.email;
@@ -24,6 +27,10 @@ public class User {
 
     public User() {
 
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getNickname() {
@@ -42,6 +49,14 @@ public class User {
         return rating;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
@@ -57,5 +72,13 @@ public class User {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public void setDefaultAvatar() {
+        this.avatar = "default";
     }
 }
