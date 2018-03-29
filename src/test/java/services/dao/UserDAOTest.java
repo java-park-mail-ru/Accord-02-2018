@@ -3,6 +3,7 @@ package services.dao;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +26,8 @@ public class UserDAOTest {
     private static final String UPDATED_PASSWORD = "example_updated_password";
     private static final String UPDATED_AVATAR = "new_avatar.png";
     private static final int USER_PER_PAGE = 10;
-    private static UserDAO userService;
-
-    public UserDAOTest(UserDAO userService) {
-        //noinspection AccessStaticViaInstance
-        this.userService = userService;
-    }
+    @Autowired
+    private UserDAO userService;
 
     @Test
     public void testSimpleCreateUser() {
