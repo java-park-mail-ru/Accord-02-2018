@@ -37,7 +37,7 @@ public class UserDAO {
 
     public Boolean login(@NotNull User userToLogin) {
         try {
-            final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?";
             final User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getEmail()}, new UserMapper());
 
             if (user.getPassword().equals(userToLogin.getPassword())) {
@@ -54,7 +54,7 @@ public class UserDAO {
 
     public User getUser(@NotNull String email) {
         try {
-            final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?";
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
             logger.log(Level.WARNING, "Exception : ", e);
@@ -74,7 +74,7 @@ public class UserDAO {
             final StringBuilder sql = new StringBuilder("UPDATE \"User\" SET");
 
             if (hasNickname) {
-                sql.append(" nickname = ?::citext");
+                sql.append(" nickname = ?");
                 sqlParameters.add(userToUpdate.getNickname());
             }
 
@@ -82,7 +82,7 @@ public class UserDAO {
                 if (hasNickname) {
                     sql.append(",");
                 }
-                sql.append(" password = ?::citext");
+                sql.append(" password = ?");
                 sqlParameters.add(userToUpdate.getPassword());
             }
 
@@ -94,7 +94,7 @@ public class UserDAO {
                 sqlParameters.add(userToUpdate.getRating());
             }
 
-            sql.append(" WHERE email = ?::citext;");
+            sql.append(" WHERE email = ?;");
             sqlParameters.add(userToUpdate.getEmail());
 
             try {
@@ -115,7 +115,7 @@ public class UserDAO {
 
         if (hasAvatarLink) {
             try {
-                jdbcTemplate.update("UPDATE \"User\" SET avatar = ?::citext WHERE email = ?::citext;",
+                jdbcTemplate.update("UPDATE \"User\" SET avatar = ? WHERE email = ?;",
                         new Object[]{userToUpdate.getAvatar(), userToUpdate.getEmail()});
                 return true;
             } catch (DataAccessException e) {
