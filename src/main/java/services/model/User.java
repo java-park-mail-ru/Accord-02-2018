@@ -79,6 +79,7 @@ public class User {
     }
 
     public void setDefaultAvatar() {
-        this.avatar = "default";
+        this.avatar = "default.jpg";
+
     }
 }

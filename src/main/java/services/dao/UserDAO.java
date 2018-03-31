@@ -1,8 +1,8 @@
 package services.dao;
 
 
+import services.exceptions.DatabaseConnectionException;
 import services.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,13 +13,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Repository
 public class UserDAO {
+    private JdbcTemplate jdbcTemplate = new JdbcTemplate();
+    private final Logger logger = Logger.getLogger(UserDAO.class.getName());
 
-    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public UserDAO(JdbcTemplate jdbcTemplate) {
+        //noinspection AccessStaticViaInstance
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public Boolean register(@NotNull User userToRegister) {
         try {
@@ -40,8 +45,10 @@ public class UserDAO {
                 return true;
             }
         } catch (DataAccessException e) {
-            return false;
+            logger.log(Level.WARNING, "Exception : ", e);
+            throw new DatabaseConnectionException("Can't connect to the database", e);
         }
+
 
         return false;
     }
@@ -51,7 +58,8 @@ public class UserDAO {
             final String sql = "SELECT * FROM \"User\" WHERE email = ?::citext";
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
-            return null;
+            logger.log(Level.WARNING, "Exception : ", e);
+            throw new DatabaseConnectionException("Can't connect to the database", e);
         }
     }
 
@@ -94,7 +102,8 @@ public class UserDAO {
                 jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
                 return true;
             } catch (DataAccessException e) {
-                return false;
+                logger.log(Level.WARNING, "Exception : ", e);
+                throw new DatabaseConnectionException("Can't connect to the database", e);
             }
         }
 
@@ -111,7 +120,8 @@ public class UserDAO {
                         new Object[]{userToUpdate.getAvatar(), userToUpdate.getEmail()});
                 return true;
             } catch (DataAccessException e) {
-                return false;
+                logger.log(Level.WARNING, "Exception : ", e);
+                throw new DatabaseConnectionException("Can't connect to the database", e);
             }
         }
 

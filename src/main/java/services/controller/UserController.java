@@ -1,9 +1,9 @@
 package services.controller;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import services.dao.UserDAO;
+import services.exceptions.DatabaseConnectionException;
 import services.model.ServerResponse;
 import services.model.User;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,6 @@ import java.io.*;
 import static services.Application.PATH_AVATARS_FOLDER;
 
 
-@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 @CrossOrigin(origins = {"*", "http://localhost:8000"})
 public class UserController {
@@ -26,10 +25,12 @@ public class UserController {
     private static final String ERROR_PASSWORD = "Empty password";
     private static final String ERROR_NICKNAME = "Empty nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
+    private static UserDAO userService;
 
-    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
-    @Autowired
-    private final UserDAO userService = new UserDAO();
+    @SuppressWarnings("AccessStaticViaInstance")
+    public UserController(UserDAO userService) {
+        this.userService = userService;
+    }
 
 
     private boolean isEmptyField(String field) {
@@ -68,18 +69,18 @@ public class UserController {
                     errorString.toString()));
         }
 
-        if (userService.register(userToRegister)) {
-            final User userForSession = userService.getUser(userToRegister.getEmail());
-            httpSession.setAttribute(SESSION_KEY, userForSession);
-
-            return ResponseEntity.status(HttpStatus.OK).body(userForSession);
-        } else {
+        if (!userService.register(userToRegister)) {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
-                    "Unsuccessful registration"));
+                    "User with same email already exists"));
         }
+
+        final User userForSession = userService.getUser(userToRegister.getEmail());
+        httpSession.setAttribute(SESSION_KEY, userForSession);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userForSession);
     }
 
 
@@ -87,13 +88,20 @@ public class UserController {
     public ResponseEntity<?> getUser(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
-        if (userFromSession != null) {
-            final User userForReturn = userService.getUser(userFromSession.getEmail());
-            return ResponseEntity.status(HttpStatus.OK).body(userForReturn);
-        } else {
+        if (userFromSession == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
                     ServerResponse("Error", "You are not login"));
         }
+
+        final User userForReturn;
+        try {
+            userForReturn = userService.getUser(userFromSession.getEmail());
+        } catch (DatabaseConnectionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                    e.getMessage()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(userForReturn);
     }
 
     @GetMapping(value = "/avatar/{avatar:.+}")
@@ -105,12 +113,12 @@ public class UserController {
             final InputStream in = new FileInputStream(imageForReturn);
 
             //noinspection ConstantConditions
-            if (in != null) {
+            if (in == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } else {
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);
                 response.setStatus(HttpServletResponse.SC_OK);
                 IOUtils.copy(in, response.getOutputStream());
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -119,37 +127,36 @@ public class UserController {
 
     @PutMapping(value = "/updateUser", produces = "application/json")
     public ResponseEntity<?> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
-        // попробуем найти уже существующие данные
-        // о юзере которому хотим обновить данные
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
-        if (userFromSession != null) {
-            // переместим значения ненулевых полей
-            if (isValidField(updateData.getRating())) {
-                userFromSession.setRating(updateData.getRating());
-            }
-
-            if (!isEmptyField(updateData.getPassword())) {
-                userFromSession.setPassword(updateData.getPassword());
-            }
-
-            if (!isEmptyField(updateData.getNickname())) {
-                userFromSession.setNickname(updateData.getNickname());
-            }
-
-            // обновляем данные если все хорошо
-            if (userService.updateUser(userFromSession)) {
-                return ResponseEntity.status(HttpStatus.OK).body(new
-                        ServerResponse("Ok", "Successful update"));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
-                        ServerResponse("Error", "Unsuccessful update"));
-            }
-        } else {
-            // если такой юзер не нашелся
+        if (userFromSession == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
                     ServerResponse("Error", "You are not login"));
         }
+
+        if (isValidField(updateData.getRating())) {
+            userFromSession.setRating(updateData.getRating());
+        }
+
+        if (!isEmptyField(updateData.getPassword())) {
+            userFromSession.setPassword(updateData.getPassword());
+        }
+
+        if (!isEmptyField(updateData.getNickname())) {
+            userFromSession.setNickname(updateData.getNickname());
+        }
+        try {
+            if (!userService.updateUser(userFromSession)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
+                        ServerResponse("Error", "Unsuccessful update"));
+            }
+        } catch (DatabaseConnectionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                    e.getMessage()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new
+                ServerResponse("Ok", "Successful update"));
     }
 
     @PostMapping(value = "/login", produces = "application/json")
@@ -170,24 +177,29 @@ public class UserController {
                     errorString.toString()));
         }
 
-        if (userService.login(userToLogin)) {
-            final User userForSession = userService.getUser(userToLogin.getEmail());
-            httpSession.setAttribute(SESSION_KEY, userForSession);
-
-            return ResponseEntity.status(HttpStatus.OK).body(userForSession);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
-                    "Invalid email or password"));
+        try {
+            if (!userService.login(userToLogin)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+                        "Invalid email or password"));
+            }
+        } catch (DatabaseConnectionException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ServerResponse("Error",
+                    e.getMessage()));
         }
+
+        final User userForSession = userService.getUser(userToLogin.getEmail());
+        httpSession.setAttribute(SESSION_KEY, userForSession);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userForSession);
     }
 
     @DeleteMapping(value = "/logout", produces = "application/json")
     public ResponseEntity<?> logout(HttpSession httpSession) {
-        if (httpSession.getAttribute(SESSION_KEY) != null) {
-            httpSession.invalidate();
-            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok", "Successful logout"));
-        } else {
+        if (httpSession.getAttribute(SESSION_KEY) == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Unsuccessful logout"));
         }
+
+        httpSession.invalidate();
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse("Ok", "Successful logout"));
     }
 }
