@@ -57,27 +57,18 @@ public class UserControllerTest {
         assertEquals("Congratulations, its successful connection", response.getBody().getMessage());
     }
 
-    @Test
-    public void testLogin() {
-        final User user = new User("admin", "admin", "admin12345", 0);
-        final HttpEntity<User> requestEntity = new HttpEntity<>(user, REQUEST_HEADERS);
-
-        final ResponseEntity<String> response = restTemplate.postForEntity("/login",
-                requestEntity, String.class);
-    }
-
-    @Test
-    public void testRegisterEmptyUser() {
-        final User userToRegister = new User("", LOGIN, PASSWORD, 0);
-        final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
-
-        final ResponseEntity<String> response = restTemplate.postForEntity("/register",
-                requestEntity, String.class);
-
-//        ResponseEntity<ServerResponse> response = restTemplate.exchange(
-//                "http://localhost:" + PORT + "/register", HttpMethod.POST, requestEntity, ServerResponse.class);
+//    @Test
+//    public void testRegisterEmptyUser() {
+//        final User userToRegister = new User("", LOGIN, PASSWORD, 0);
+//        final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
 //
-////        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-////        assertEquals(" Empty nickname", response.getBody().getMessage());
-    }
+//        final ResponseEntity<String> response = restTemplate.postForEntity("/register",
+//                requestEntity, String.class);
+//
+////        ResponseEntity<ServerResponse> response = restTemplate.exchange(
+////                "http://localhost:" + PORT + "/register", HttpMethod.POST, requestEntity, ServerResponse.class);
+////
+//////        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+//////        assertEquals(" Empty nickname", response.getBody().getMessage());
+//    }
 }

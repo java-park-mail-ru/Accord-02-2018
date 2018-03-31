@@ -23,6 +23,7 @@ public class User {
         this.password = user.password;
         this.email = user.email;
         this.rating = user.rating;
+        this.avatar = user.avatar;
     }
 
     public User() {

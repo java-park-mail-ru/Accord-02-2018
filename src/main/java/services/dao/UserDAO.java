@@ -18,11 +18,10 @@ import java.util.logging.Logger;
 
 @Repository
 public class UserDAO {
-    private JdbcTemplate jdbcTemplate = new JdbcTemplate();
+    private final JdbcTemplate jdbcTemplate;
     private final Logger logger = Logger.getLogger(UserDAO.class.getName());
 
     public UserDAO(JdbcTemplate jdbcTemplate) {
-        //noinspection AccessStaticViaInstance
         this.jdbcTemplate = jdbcTemplate;
     }
 
