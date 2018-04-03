@@ -9,6 +9,7 @@ import services.Application;
 @SpringBootTest(classes = Application.class)
 public class ApplicationTest {
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void contextLoads() {
 

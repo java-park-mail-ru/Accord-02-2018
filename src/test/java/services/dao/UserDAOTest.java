@@ -20,7 +20,9 @@ import static org.junit.Assert.assertNotNull;
 @Transactional
 public class UserDAOTest {
     private static final String LOGIN = "example_login";
+    @SuppressWarnings("unused")
     private static final String LOGIN_FIRST = "example_login_1";
+    @SuppressWarnings("unused")
     private static final String LOGIN_SECOND = "example_login_2";
     private static final String PASSWORD = "example_password";
     private static final String UPDATED_PASSWORD = "example_updated_password";

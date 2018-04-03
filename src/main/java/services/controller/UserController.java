@@ -112,16 +112,11 @@ public class UserController {
         try {
             final InputStream in = new FileInputStream(imageForReturn);
 
-            //noinspection ConstantConditions
-            if (in == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            } else {
-                response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-                response.setStatus(HttpServletResponse.SC_OK);
-                IOUtils.copy(in, response.getOutputStream());
-            }
+            response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+            response.setStatus(HttpServletResponse.SC_OK);
+            IOUtils.copy(in, response.getOutputStream());
         } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 

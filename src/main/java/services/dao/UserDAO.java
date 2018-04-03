@@ -133,7 +133,8 @@ public class UserDAO {
             final String sql = "SELECT * FROM \"User\" ORDER BY rating DESC LIMIT ? OFFSET ?;";
             return jdbcTemplate.query(sql, new Object[]{userPerPage, offset}, new UserInfoMapper());
         } catch (DataAccessException e) {
-            return null;
+            logger.log(Level.WARNING, "Exception : ", e);
+            throw new DatabaseConnectionException("Can't connect to the database", e);
         }
     }
 

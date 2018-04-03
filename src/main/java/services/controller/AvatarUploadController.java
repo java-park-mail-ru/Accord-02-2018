@@ -30,13 +30,13 @@ public class AvatarUploadController {
     public ResponseEntity<?> provideUploadInfo(HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
-        if (userFromSession != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ServerResponse("Ok", "Ready to load your avatar"));
-        } else {
+        if (userFromSession == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ServerResponse("Error", "You are not login"));
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ServerResponse("Ok", "Ready to load your avatar"));
     }
 
     @SuppressWarnings({"OverlyBroadCatchBlock", "ConstantConditions", "IOResourceOpenedButNotSafelyClosed"})

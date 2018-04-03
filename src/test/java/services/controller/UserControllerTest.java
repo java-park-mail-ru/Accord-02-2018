@@ -1,6 +1,7 @@
 package services.controller;
 
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,23 +12,25 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import services.dao.UserDAO;
+import services.model.ScoreBoard;
 import services.model.ServerResponse;
 import services.model.User;
 
 
 import java.util.ArrayList;
 
+
 import static org.junit.Assert.assertEquals;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class UserControllerTest {
-    private static final int PORT = 5001;
-    private static final String LOGIN = "example_login";
-    private static final String LOGIN_FIRST = "example_login_1";
-    private static final String PASSWORD = "example_password";
-    private static final int USER_PER_PAGE = 10;
+//    private static final int PORT = 5001;
+//    private static final String LOGIN = "example_login";
+//    private static final String LOGIN_FIRST = "example_login_1";
+//    private static final String PASSWORD = "example_password";
+//    private static final int USER_PER_PAGE = 10;
     private static final HttpHeaders REQUEST_HEADERS = new HttpHeaders();
 
     @MockBean
@@ -56,6 +59,55 @@ public class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Congratulations, its successful connection", response.getBody().getMessage());
     }
+
+    @Test
+    public void testGetUserRequiresLogin() {
+        final ResponseEntity<User> getUserResponse = restTemplate.getForEntity("/getUser", User.class);
+        assertEquals(HttpStatus.UNAUTHORIZED, getUserResponse.getStatusCode());
+    }
+
+    @Test
+    public void testUpdateAvatarRequiresLogin() {
+        final ResponseEntity<User> updateAvatarResponse = restTemplate.getForEntity("/updateAvatar", User.class);
+        assertEquals(HttpStatus.UNAUTHORIZED, updateAvatarResponse.getStatusCode());
+    }
+
+    @Test
+    public void testGetAvatarNotFound() {
+        final ResponseEntity<User> getAvatarResponse = restTemplate.getForEntity("/avatar/defaultумвдльдм.jpg", User.class);
+        assertEquals(HttpStatus.NOT_FOUND, getAvatarResponse.getStatusCode());
+    }
+
+    @Test
+    public void testGetLeadersEmpty() {
+        final HttpEntity<User> requestEntity = new HttpEntity<>(REQUEST_HEADERS);
+        final ResponseEntity<ScoreBoard> response = restTemplate.getForEntity("/scoreboard/1", ScoreBoard.class, requestEntity);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assert.assertTrue(response.getBody().getScoreBoard().isEmpty());
+    }
+
+//    @Test
+//    public void testLogin() {
+//        login();
+//    }
+//
+//    private List<String> login() {
+//        when(userService.ensureUserExists(anyString())).thenReturn(new User("tester"));
+//
+//        final ResponseEntity<User> loginResp = restTemplate.postForEntity("/login", null, User.class);
+//        assertEquals(HttpStatus.OK, loginResp.getStatusCode());
+//
+//        final List<String> cookies = loginResp.getHeaders().get("Set-Cookie");
+//        assertNotNull(cookies);
+//        assertFalse(cookies.isEmpty());
+//
+//        final User user = loginResp.getBody();
+//        assertNotNull(user);
+//        assertEquals("tester", user.getNickname());
+//
+//        return cookies;
+//    }
 
 //    @Test
 //    public void testRegisterEmptyUser() {
