@@ -26,11 +26,12 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class UserControllerTest {
-//    private static final int PORT = 5001;
-//    private static final String LOGIN = "example_login";
-//    private static final String LOGIN_FIRST = "example_login_1";
-//    private static final String PASSWORD = "example_password";
-//    private static final int USER_PER_PAGE = 10;
+    private static final String LOGIN = "example_login";
+    @SuppressWarnings("unused")
+    private static final String LOGIN_FIRST = "example_login_1";
+    private static final String PASSWORD = "example_password";
+    @SuppressWarnings("unused")
+    private static final int USER_PER_PAGE = 10;
     private static final HttpHeaders REQUEST_HEADERS = new HttpHeaders();
 
     @MockBean
@@ -43,7 +44,7 @@ public class UserControllerTest {
     @BeforeClass
     public static void setHttpHeaders() {
         final ArrayList<String> origin = new ArrayList<>();
-        origin.add("http://localhost:" + "8000");
+        origin.add("http://localhost:8000");
         REQUEST_HEADERS.put(HttpHeaders.ORIGIN, origin);
 
         final ArrayList<String> contentType = new ArrayList<>();
@@ -74,7 +75,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetAvatarNotFound() {
-        final ResponseEntity<User> getAvatarResponse = restTemplate.getForEntity("/avatar/defaultумвдльдм.jpg", User.class);
+        final ResponseEntity<User> getAvatarResponse = restTemplate.getForEntity("/avatar/defaultуSuperPuperAvak.jpg", User.class);
         assertEquals(HttpStatus.NOT_FOUND, getAvatarResponse.getStatusCode());
     }
 
@@ -109,18 +110,15 @@ public class UserControllerTest {
 //        return cookies;
 //    }
 
-//    @Test
-//    public void testRegisterEmptyUser() {
-//        final User userToRegister = new User("", LOGIN, PASSWORD, 0);
-//        final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
-//
-//        final ResponseEntity<String> response = restTemplate.postForEntity("/register",
-//                requestEntity, String.class);
-//
-////        ResponseEntity<ServerResponse> response = restTemplate.exchange(
-////                "http://localhost:" + PORT + "/register", HttpMethod.POST, requestEntity, ServerResponse.class);
-////
-//////        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-//////        assertEquals(" Empty nickname", response.getBody().getMessage());
-//    }
+    @Test
+    public void testRegisterEmptyUser() {
+        final User userToRegister = new User("", LOGIN, PASSWORD, 0);
+        final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
+
+        final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/register",
+                requestEntity, ServerResponse.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(" Empty nickname", response.getBody().getMessage());
+    }
 }

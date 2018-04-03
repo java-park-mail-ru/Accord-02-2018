@@ -18,7 +18,7 @@ import static services.Application.PATH_AVATARS_FOLDER;
 
 
 @RestController
-@CrossOrigin(origins = {"*", "http://localhost:8000"})
+@CrossOrigin(origins = {"http://127.0.0.1:8000"})
 public class UserController {
     private static final String SESSION_KEY = "SESSION_KEY";
     private static final String ERROR_EMAIL = "Empty email";
@@ -65,7 +65,7 @@ public class UserController {
         }
 
         if (errorString.length() > 0) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ServerResponse("Error",
                     errorString.toString()));
         }
 
@@ -73,7 +73,7 @@ public class UserController {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ServerResponse("Error",
                     "User with same email already exists"));
         }
 
