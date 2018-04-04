@@ -20,10 +20,6 @@ import static org.junit.Assert.assertNotNull;
 @Transactional
 public class UserDAOTest {
     private static final String LOGIN = "example_login";
-    @SuppressWarnings("unused")
-    private static final String LOGIN_FIRST = "example_login_1";
-    @SuppressWarnings("unused")
-    private static final String LOGIN_SECOND = "example_login_2";
     private static final String PASSWORD = "example_password";
     private static final String UPDATED_PASSWORD = "example_updated_password";
     private static final String UPDATED_AVATAR = "new_avatar.png";
@@ -109,26 +105,6 @@ public class UserDAOTest {
             assert false;
         }
     }
-
-    /*@Test
-    public void testGetSortedUsersInfoByRating() {
-        final User user0 = new User(LOGIN, LOGIN, PASSWORD, 9998);
-        final User user1 = new User(LOGIN_FIRST, LOGIN_FIRST, PASSWORD, 9999);
-        final User user2 = new User(LOGIN_SECOND, LOGIN_SECOND, PASSWORD, 10000);
-
-        if (userService.register(user0) &&
-                userService.register(user1) &&
-                userService.register(user2)) {
-            final ArrayList<User> listOfUsers = (ArrayList<User>) userService.getSortedUsersInfoByRating(USER_PER_PAGE, 1);
-
-            assertNotNull(listOfUsers);
-            assertEquals(listOfUsers.get(0).getNickname(), user2.getNickname());
-            assertEquals(listOfUsers.get(1).getNickname(), user1.getNickname());
-            assertEquals(listOfUsers.get(2).getNickname(), user0.getNickname());
-        } else {
-            assert false;
-        }
-    }*/
 
     @Test
     public void testGetLastPage() {
