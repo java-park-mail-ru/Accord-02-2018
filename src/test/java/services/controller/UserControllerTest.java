@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -29,7 +28,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 public class UserControllerTest {
     private static final String LOGIN = "example_login";
-    @SuppressWarnings("unused")
     private static final String LOGIN_FIRST = "example_login_1";
     private static final String PASSWORD = "example_password";
     private static final String WRONG_PASSWORD = "wrong_password";
@@ -110,10 +108,10 @@ public class UserControllerTest {
 
     @Test
     public void testRegisterSameUserExist() {
-        final User existUser = new User();
-        when(userService.getUser(anyString())).thenReturn(existUser);
+        final User existUser = new User(LOGIN, LOGIN, PASSWORD, 0);
+        when(userService.getUser(LOGIN)).thenReturn(existUser);
 
-        final User userToRegister = new User(LOGIN, LOGIN, PASSWORD, 0);
+        final User userToRegister = new User(LOGIN_FIRST, LOGIN, PASSWORD, 0);
         final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
 
         final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/register",
@@ -139,7 +137,7 @@ public class UserControllerTest {
     @Test
     public void testLoginWrongPassword() {
         final User existUser = new User(LOGIN, LOGIN, PASSWORD, 0);
-        when(userService.getUser(anyString())).thenReturn(existUser);
+        when(userService.getUser(LOGIN)).thenReturn(existUser);
 
         final User userToLogin = new User(LOGIN, LOGIN, WRONG_PASSWORD, 0);
         final HttpEntity<User> requestEntity = new HttpEntity<>(userToLogin, REQUEST_HEADERS);

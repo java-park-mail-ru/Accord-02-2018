@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 @Transactional
 public class UserDAOTest {
     private static final String LOGIN = "example_login";
+    private static final String NICKNAME = "example_nickname";
     private static final String PASSWORD = "example_password";
     private static final String UPDATED_PASSWORD = "example_updated_password";
     private static final String UPDATED_AVATAR = "new_avatar.png";
@@ -31,7 +32,7 @@ public class UserDAOTest {
 
     @Test
     public void testSimpleCreateUser() {
-        final User userToRegister = new User("", LOGIN, PASSWORD, 0);
+        final User userToRegister = new User(NICKNAME, LOGIN, PASSWORD, 0);
 
         if (userService.register(userToRegister)) {
             final User createdUser = userService.getUser(LOGIN);
@@ -46,9 +47,9 @@ public class UserDAOTest {
 
     @Test
     public void testCreateDuplicatedUser() {
-        final User user = new User("", LOGIN, PASSWORD, 0);
+        final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
         if (userService.register(user)) {
-            final User duplicatedUser = new User("", LOGIN, PASSWORD, 0);
+            final User duplicatedUser = new User(NICKNAME, LOGIN, PASSWORD, 0);
             assert (!userService.register(duplicatedUser));
         } else {
             assert false;
@@ -57,7 +58,7 @@ public class UserDAOTest {
 
     @Test
     public void testLoginUser() {
-        final User userToLogin = new User("", LOGIN, PASSWORD, 0);
+        final User userToLogin = new User(NICKNAME, LOGIN, PASSWORD, 0);
         if (userService.register(userToLogin) &&
                 userService.login(userToLogin)) {
             final User createdUser = userService.getUser(LOGIN);
@@ -69,7 +70,7 @@ public class UserDAOTest {
 
     @Test
     public void testGetUser() {
-        final User user = new User("", LOGIN, PASSWORD, 0);
+        final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
         if (userService.register(user)) {
             final User existUser = userService.getUser(user.getEmail());
             assertNotNull(existUser);
@@ -80,7 +81,7 @@ public class UserDAOTest {
 
     @Test
     public void testUpdatetUser() {
-        final User user = new User("", LOGIN, PASSWORD, 0);
+        final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
         if (userService.register(user)) {
             user.setPassword(UPDATED_PASSWORD);
             final Boolean updatedUser = userService.updateUser(user);
@@ -94,7 +95,7 @@ public class UserDAOTest {
 
     @Test
     public void testUpdateAvatar() {
-        final User user = new User("", LOGIN, PASSWORD, 0);
+        final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
         if (userService.register(user)) {
             user.setAvatar(UPDATED_AVATAR);
             final Boolean updatedUser = userService.updateAvatar(user);
@@ -108,7 +109,7 @@ public class UserDAOTest {
 
     @Test
     public void testGetLastPage() {
-        final User user = new User("", LOGIN, PASSWORD, 0);
+        final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
         if (userService.register(user)) {
             final Integer lastPage = userService.getLastPage(USER_PER_PAGE);
 

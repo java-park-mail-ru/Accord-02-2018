@@ -27,7 +27,7 @@ public class UserDAO {
 
     public Boolean register(@NotNull User userToRegister) {
         try {
-            final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
+            final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?);";
             jdbcTemplate.update(sql, userToRegister.getEmail(), userToRegister.getNickname(), userToRegister.getPassword());
             return true;
         } catch (DataAccessException e) {
@@ -37,7 +37,7 @@ public class UserDAO {
 
     public Boolean login(@NotNull User userToLogin) {
         try {
-            final String sql = "SELECT * FROM \"User\" WHERE email = ?";
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?;";
             final User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getEmail()}, new UserMapper());
 
             if (user.getPassword().equals(userToLogin.getPassword())) {
@@ -54,7 +54,7 @@ public class UserDAO {
 
     public User getUser(@NotNull String email) {
         try {
-            final String sql = "SELECT * FROM \"User\" WHERE email = ?";
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?;";
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
             logger.log(Level.WARNING, "Exception : ", e);
