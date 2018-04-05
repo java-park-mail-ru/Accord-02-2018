@@ -18,7 +18,7 @@ import static services.Application.PATH_AVATARS_FOLDER;
 
 
 @RestController
-@CrossOrigin(origins = {"*", "http://localhost:8000"})
+@CrossOrigin(origins = {"http://127.0.0.1:8000"})
 public class UserController {
     private static final String SESSION_KEY = "SESSION_KEY";
     private static final String ERROR_EMAIL = "Empty email";
@@ -65,7 +65,7 @@ public class UserController {
         }
 
         if (errorString.length() > 0) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error",
                     errorString.toString()));
         }
 
@@ -73,7 +73,7 @@ public class UserController {
             // если попали в этот блок
             // значит такой юзер с таким мейлом уже существует
             // поэтому просто вернем ошибку
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ServerResponse("Error",
                     "User with same email already exists"));
         }
 
@@ -104,33 +104,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userForReturn);
     }
 
-    @GetMapping(value = "/avatar/{avatar:.+}")
-    public void getAvatar(@PathVariable("avatar") String avatar, HttpServletResponse response) {
-        @SuppressWarnings("TooBroadScope") final File imageForReturn = new File(PATH_AVATARS_FOLDER, avatar);
-
-        //noinspection OverlyBroadCatchBlock
-        try {
-            final InputStream in = new FileInputStream(imageForReturn);
-
-            //noinspection ConstantConditions
-            if (in == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            } else {
-                response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-                response.setStatus(HttpServletResponse.SC_OK);
-                IOUtils.copy(in, response.getOutputStream());
-            }
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
-    }
-
     @PutMapping(value = "/updateUser", produces = "application/json")
     public ResponseEntity<?> update(@RequestBody @NotNull User updateData, HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
 
         if (userFromSession == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new
                     ServerResponse("Error", "You are not login"));
         }
 
@@ -159,6 +138,22 @@ public class UserController {
                 ServerResponse("Ok", "Successful update"));
     }
 
+    @GetMapping(value = "/avatar/{avatar:.+}")
+    public void getAvatar(@PathVariable("avatar") String avatar, HttpServletResponse response) {
+        @SuppressWarnings("TooBroadScope") final File imageForReturn = new File(PATH_AVATARS_FOLDER, avatar);
+
+        //noinspection OverlyBroadCatchBlock
+        try {
+            final InputStream in = new FileInputStream(imageForReturn);
+
+            response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+            response.setStatus(HttpServletResponse.SC_OK);
+            IOUtils.copy(in, response.getOutputStream());
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
     @PostMapping(value = "/login", produces = "application/json")
     public ResponseEntity<?> login(@RequestBody User userToLogin, HttpSession httpSession) {
         final StringBuilder errorString = new StringBuilder();
@@ -173,13 +168,13 @@ public class UserController {
         }
 
         if (errorString.length() > 0) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error",
                     errorString.toString()));
         }
 
         try {
             if (!userService.login(userToLogin)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ServerResponse("Error",
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ServerResponse("Error",
                         "Invalid email or password"));
             }
         } catch (DatabaseConnectionException e) {
@@ -196,7 +191,7 @@ public class UserController {
     @DeleteMapping(value = "/logout", produces = "application/json")
     public ResponseEntity<?> logout(HttpSession httpSession) {
         if (httpSession.getAttribute(SESSION_KEY) == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "Unsuccessful logout"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse("Error", "You are not login"));
         }
 
         httpSession.invalidate();

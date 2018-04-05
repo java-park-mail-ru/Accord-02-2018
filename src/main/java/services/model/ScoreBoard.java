@@ -11,6 +11,7 @@ public class ScoreBoard {
     public ScoreBoard() {
         this.currentPage = 0;
         this.numberOfPages = 0;
+        //noinspection ConstantConditions
         this.scoreBoard = null;
     }
 
