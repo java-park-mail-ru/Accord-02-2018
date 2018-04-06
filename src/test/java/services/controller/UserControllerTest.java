@@ -65,8 +65,8 @@ public class UserControllerTest {
 
     @Test
     public void testGetAvatarNotFound() {
-        final ResponseEntity<User> getAvatarResponse = restTemplate.
-                getForEntity("/avatar/defaultуSuper.gif", User.class);
+        final ResponseEntity<?> getAvatarResponse = restTemplate.
+                getForEntity("/avatar/defaultуSuper.gif", null);
         assertEquals(HttpStatus.NOT_FOUND, getAvatarResponse.getStatusCode());
     }
 

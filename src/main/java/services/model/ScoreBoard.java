@@ -31,7 +31,6 @@ public class ScoreBoard {
         return this.numberOfPages;
     }
 
-    @SuppressWarnings("unused")
     public List<User> getScoreBoard() {
         return this.scoreBoard;
     }
