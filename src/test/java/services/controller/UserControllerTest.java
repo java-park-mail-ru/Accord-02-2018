@@ -1,6 +1,8 @@
 package services.controller;
 
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,11 +28,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class UserControllerTest {
-    private static final String LOGIN = "example_login";
-    private static final String LOGIN_FIRST = "example_login_1";
-    private static final String NICKNAME = "example_nickname";
-    private static final String PASSWORD = "example_password";
-    private static final String WRONG_PASSWORD = "wrong_password";
+    private static final User user = new User();
     private static final HttpHeaders REQUEST_HEADERS = new HttpHeaders();
 
     @MockBean
@@ -70,10 +68,18 @@ public class UserControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, getAvatarResponse.getStatusCode());
     }
 
+    @Before
+    public void setUser() {
+        user.setEmail("example_email@mail.ru");
+        user.setNickname("example_nickname");
+        user.setPassword("example_password");
+        user.setRating(0);
+    }
+
     @Test
     public void testRegisterRequiresEmail() {
-        final User userToRegister = new User(NICKNAME, "", PASSWORD, 0);
-        final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
+        user.setEmail("");
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user, REQUEST_HEADERS);
 
         final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/register",
                 requestEntity, ServerResponse.class);
@@ -82,17 +88,28 @@ public class UserControllerTest {
         assertEquals("Empty email", response.getBody().getMessage());
     }
 
+    @Test
+    public void testLoginRequiresEmail() {
+        user.setEmail("");
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user, REQUEST_HEADERS);
+
+        final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/login",
+                requestEntity, ServerResponse.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Empty email", response.getBody().getMessage());
+    }
 
     @Test
     public void testRegisterSameUserExist() {
         when(userService.register(any())).thenReturn(false);
 
-        final User userToRegister = new User(LOGIN_FIRST, LOGIN, PASSWORD, 0);
-        final HttpEntity<User> requestEntity = new HttpEntity<>(userToRegister, REQUEST_HEADERS);
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user, REQUEST_HEADERS);
 
         final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/register",
                 requestEntity, ServerResponse.class);
 
+        System.out.println(response.getBody().getMessage());
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertEquals("User with same email already exists", response.getBody().getMessage());
     }
@@ -101,25 +118,12 @@ public class UserControllerTest {
     public void testLoginWrongPassword() {
         when(userService.login(any())).thenReturn(false);
 
-        final User userToLogin = new User(NICKNAME, LOGIN, WRONG_PASSWORD, 0);
-        final HttpEntity<User> requestEntity = new HttpEntity<>(userToLogin, REQUEST_HEADERS);
+        final HttpEntity<User> requestEntity = new HttpEntity<>(user, REQUEST_HEADERS);
 
         final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/login",
                 requestEntity, ServerResponse.class);
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertEquals("Invalid email or password", response.getBody().getMessage());
-    }
-
-    @Test
-    public void testLoginRequiresEmail() {
-        final User userToLogin = new User(NICKNAME, "", PASSWORD, 0);
-        final HttpEntity<User> requestEntity = new HttpEntity<>(userToLogin, REQUEST_HEADERS);
-
-        final ResponseEntity<ServerResponse> response = restTemplate.postForEntity("/login",
-                requestEntity, ServerResponse.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Empty email", response.getBody().getMessage());
     }
 }

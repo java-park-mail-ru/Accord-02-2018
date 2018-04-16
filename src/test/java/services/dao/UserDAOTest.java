@@ -13,6 +13,7 @@ import services.model.User;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(SpringRunner.class)
@@ -34,15 +35,12 @@ public class UserDAOTest {
     public void testSimpleCreateUser() {
         final User userToRegister = new User(NICKNAME, LOGIN, PASSWORD, 0);
 
-        if (userService.register(userToRegister)) {
-            final User createdUser = userService.getUser(LOGIN);
+        assertTrue(userService.register(userToRegister));
+        final User createdUser = userService.getUser(LOGIN);
 
-            assertNotNull(createdUser);
-            assertEquals(LOGIN, createdUser.getEmail());
-            assertEquals(PASSWORD, createdUser.getPassword());
-        } else {
-            assert false;
-        }
+        assertNotNull(createdUser);
+        assertEquals(LOGIN, createdUser.getEmail());
+        assertEquals(PASSWORD, createdUser.getPassword());
     }
 
     @Test
@@ -59,64 +57,53 @@ public class UserDAOTest {
     @Test
     public void testLoginUser() {
         final User userToLogin = new User(NICKNAME, LOGIN, PASSWORD, 0);
-        if (userService.register(userToLogin) &&
-                userService.login(userToLogin)) {
-            final User createdUser = userService.getUser(LOGIN);
-            assertNotNull(createdUser);
-        } else {
-            assert false;
-        }
+        assertTrue(userService.register(userToLogin) &&
+                userService.login(userToLogin));
+
+        final User createdUser = userService.getUser(LOGIN);
+        assertNotNull(createdUser);
     }
 
     @Test
     public void testGetUser() {
         final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
-        if (userService.register(user)) {
-            final User existUser = userService.getUser(user.getEmail());
-            assertNotNull(existUser);
-        } else {
-            assert false;
-        }
+        assertTrue(userService.register(user));
+
+        final User existUser = userService.getUser(user.getEmail());
+        assertNotNull(existUser);
     }
 
     @Test
     public void testUpdatetUser() {
         final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
-        if (userService.register(user)) {
-            user.setPassword(UPDATED_PASSWORD);
-            final Boolean updatedUser = userService.updateUser(user);
+        assertTrue(userService.register(user));
 
-            assertNotNull(updatedUser);
-            assertEquals(true, updatedUser);
-        } else {
-            assert false;
-        }
+        user.setPassword(UPDATED_PASSWORD);
+        final Boolean updatedUser = userService.updateUser(user);
+
+        assertNotNull(updatedUser);
+        assertEquals(true, updatedUser);
     }
 
     @Test
     public void testUpdateAvatar() {
         final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
-        if (userService.register(user)) {
-            user.setAvatar(UPDATED_AVATAR);
-            final Boolean updatedUser = userService.updateAvatar(user);
+        assertTrue(userService.register(user));
 
-            assertNotNull(updatedUser);
-            assertEquals(true, updatedUser);
-        } else {
-            assert false;
-        }
+        user.setAvatar(UPDATED_AVATAR);
+        final Boolean updatedUser = userService.updateAvatar(user);
+
+        assertNotNull(updatedUser);
+        assertEquals(true, updatedUser);
     }
 
     @Test
     public void testGetLastPage() {
         final User user = new User(NICKNAME, LOGIN, PASSWORD, 0);
-        if (userService.register(user)) {
-            final Integer lastPage = userService.getLastPage(USER_PER_PAGE);
+        assertTrue(userService.register(user));
 
-            assertNotNull(lastPage);
-            assertEquals(lastPage.toString(), "1");
-        } else {
-            assert false;
-        }
+        final Integer lastPage = userService.getLastPage(USER_PER_PAGE);
+        assertNotNull(lastPage);
+        assertEquals(lastPage.toString(), "1");
     }
 }

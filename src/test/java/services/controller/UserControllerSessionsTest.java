@@ -79,27 +79,6 @@ public class UserControllerSessionsTest {
         login();
     }
 
-    private List<String> login() {
-        final User userToLogin = new User(NICKNAME, LOGIN, PASSWORD, 0);
-        when(userService.login(any())).thenReturn(true);
-        when(userService.getUser(anyString())).thenReturn(userToLogin);
-
-        final HttpEntity<User> requestEntity = new HttpEntity<>(userToLogin, REQUEST_HEADERS);
-        final ResponseEntity<User> loginResponse = restTemplate.postForEntity("/login", requestEntity, User.class);
-
-        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
-
-        final List<String> cookies = loginResponse.getHeaders().get("Set-Cookie");
-        assertNotNull(cookies);
-        assertFalse(cookies.isEmpty());
-
-        final User responseUser = loginResponse.getBody();
-        assertNotNull(responseUser);
-        assertEquals(NICKNAME, responseUser.getNickname());
-
-        return cookies;
-    }
-
     @Test
     public void testGetUserSuccessful() {
         final User userToGet = new User(NICKNAME, LOGIN, PASSWORD, 0);
@@ -165,5 +144,26 @@ public class UserControllerSessionsTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Successful logout", response.getBody().getMessage());
+    }
+
+    private List<String> login() {
+        final User userToLogin = new User(NICKNAME, LOGIN, PASSWORD, 0);
+        when(userService.login(any())).thenReturn(true);
+        when(userService.getUser(anyString())).thenReturn(userToLogin);
+
+        final HttpEntity<User> requestEntity = new HttpEntity<>(userToLogin, REQUEST_HEADERS);
+        final ResponseEntity<User> loginResponse = restTemplate.postForEntity("/login", requestEntity, User.class);
+
+        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
+
+        final List<String> cookies = loginResponse.getHeaders().get("Set-Cookie");
+        assertNotNull(cookies);
+        assertFalse(cookies.isEmpty());
+
+        final User responseUser = loginResponse.getBody();
+        assertNotNull(responseUser);
+        assertEquals(NICKNAME, responseUser.getNickname());
+
+        return cookies;
     }
 }
