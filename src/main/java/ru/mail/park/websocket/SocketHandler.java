@@ -79,7 +79,7 @@ public class SocketHandler extends TextWebSocketHandler {
                     ClientRequestData.class);
 
             if (session.getAttributes().get("RoomID") != null) {
-                LOGGER.warn("Message to GameRoom #" + session.getAttributes().get("RoomID").toString());
+                LOGGER.info("Message to GameRoom #" + session.getAttributes().get("RoomID").toString());
 
                 gameRoomService.updateGameRoomState(clientData, session);
             }

@@ -11,6 +11,7 @@ import ru.mail.park.websocket.models.ClientRequestData;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -20,7 +21,7 @@ public final class GameRoomService {
 
     // Общая очередь сессий игроков
     // которые ждут онлайн игры
-    private final Queue<WebSocketSession> queue = new LinkedList<>();
+    private final LinkedBlockingDeque<WebSocketSession> queue = new LinkedBlockingDeque<>();
     private final ConcurrentHashMap<Long, GameRoom> gameRoomsMap = new ConcurrentHashMap<>();
     private final UserDAO userService;
 
@@ -36,7 +37,7 @@ public final class GameRoomService {
         queue.add(webSocketSession);
 
         if (queue.size() > 1) {
-            LOGGER.warn("2 players found");
+            LOGGER.info("2 players found");
 
             final Long roomId = ID_GENERATOR.getAndIncrement();
 
@@ -57,7 +58,7 @@ public final class GameRoomService {
                     LOGGER.warn("Lost session");
                 }
 
-                LOGGER.warn("2 sessions from same user. Abort creating GameRoom.");
+                LOGGER.info("2 sessions from same user. Abort creating GameRoom.");
             }
         }
     }
