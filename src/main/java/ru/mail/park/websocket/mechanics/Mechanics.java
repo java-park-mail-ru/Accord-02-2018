@@ -51,7 +51,7 @@ public class Mechanics {
 
     public static void updateHomerState(Homer homer, long time) {
         if (isReachedBorder(homer)) {
-            LOGGER.warn("Turn Homer in back current");
+            LOGGER.info("Turn Homer in back current");
 
             homer.setVelocity(-1 * homer.getVelocity());
             homer.setPositionY(homer.getPositionY() + homer.getVelocity() * (double) time * Config.ACCURACY_OF_STEP);

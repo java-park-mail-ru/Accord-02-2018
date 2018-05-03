@@ -83,8 +83,8 @@ public class SocketHandler extends TextWebSocketHandler {
 
                 gameRoomService.updateGameRoomState(clientData, session);
             }
-        } catch (IOException ex) {
-            LOGGER.error("Wrong json format at game response", ex);
+        } catch (IOException e) {
+            LOGGER.error("Wrong json format at game response", e);
         }
     }
 
@@ -114,7 +114,7 @@ public class SocketHandler extends TextWebSocketHandler {
             //noinspection ConstantConditions
             session.close(status);
         } catch (IOException ignore) {
-            LOGGER.debug("Ignore", ignore);
+            LOGGER.warn("Error on closing session", ignore);
         }
     }
 }

@@ -49,16 +49,16 @@ public class GameLoop implements Runnable {
                     final long sleepingTime = Math.max(0, STEP_TIME - (after - before));
                     Thread.sleep(sleepingTime);
                 } catch (InterruptedException e) {
-                    LOGGER.warn("interupted");
+                    LOGGER.warn("Thread interrupted by sleep function", e);
                     break;
                 }
 
                 if (Thread.currentThread().isInterrupted()) {
-                    LOGGER.warn("interupted");
+                    LOGGER.info("Thread correctly interrupted. All ok");
                     break;
                 }
             } catch (RuntimeException e) {
-                LOGGER.warn("GameMechanics failed");
+                LOGGER.warn("GameMechanics failed", e);
                 break;
             }
         }

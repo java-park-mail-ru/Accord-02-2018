@@ -70,7 +70,7 @@ public final class GameRoomService {
     }
 
     public void destroyGameRoom(Long id) {
-        LOGGER.warn("Destroy room");
+        LOGGER.info("Destroy room");
 
         gameRoomsMap.get(id).stopGame();
         gameRoomsMap.remove(id);

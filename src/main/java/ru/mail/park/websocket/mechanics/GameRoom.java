@@ -25,8 +25,6 @@ public class GameRoom {
     private final @NotNull Player second;
     private final @NotNull Homer homer;
     @SuppressWarnings("FieldCanBeLocal")
-    private final UserDAO userService;
-    private boolean isFinished;
     private final MessageSender sender;
     private final GameLoop gameLoop;
     private final Thread thread;
@@ -36,9 +34,7 @@ public class GameRoom {
         this.first = new Player((Long) session1.getAttributes().get("UserID"), session1, true);
         this.second = new Player((Long) session2.getAttributes().get("UserID"), session2, false);
         this.homer = new Homer();
-        this.userService = userService;
 
-        this.isFinished = false;
         sender = new MessageSender();
         gameLoop = new GameLoop(this);
         thread = new Thread(gameLoop);
@@ -67,15 +63,6 @@ public class GameRoom {
         }
 
         throw new IllegalArgumentException("Requested enemy for game but user not participant");
-    }
-
-
-    public void setFinished() {
-        isFinished = true;
-    }
-
-    public boolean isFinished() {
-        return isFinished;
     }
 
 
@@ -110,7 +97,6 @@ public class GameRoom {
 
     public boolean tryFinishGame() {
         if (first.getScore() >= Config.SCORES_TO_WIN || second.getScore() >= Config.SCORES_TO_WIN) {
-            isFinished = true;
             return true;
         }
 
@@ -119,7 +105,6 @@ public class GameRoom {
 
     public void stopGame() {
         gameLoop.stop();
-        thread.interrupt();
 
         notePlayers();
 
@@ -130,7 +115,7 @@ public class GameRoom {
                 first.getSession().close();
             }
         } catch (IOException e) {
-            LOGGER.warn("Error closing session of first player");
+            LOGGER.warn("Error closing session of first player", e);
         }
 
         // закрываем сессию
@@ -140,14 +125,14 @@ public class GameRoom {
                 second.getSession().close();
             }
         } catch (IOException e) {
-            LOGGER.warn("Error closing session of second player");
+            LOGGER.warn("Error closing session of second player", e);
         }
     }
 
     public void notePlayers() {
         if (first.getScore() == second.getScore()) {
-            sender.send(first.getSession(), createMessage("It is draw", first.getScore()));
-            sender.send(second.getSession(), createMessage("It is draw", second.getScore()));
+            sender.send(first.getSession(), createMessage("It is draw", first.getScore()).toString());
+            sender.send(second.getSession(), createMessage("It is draw", second.getScore()).toString());
             return;
         }
 
