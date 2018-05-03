@@ -21,6 +21,7 @@
  
  -->
 
+<!--suppress XmlHighlighting -->
 <module name = "Checker">
     <property name="charset" value="UTF-8"/>
     

@@ -15,6 +15,7 @@ public class User {
         this.password = password;
         this.email = email;
         this.rating = rating;
+        this.setDefaultAvatar();
     }
 
     public User(User user) {
@@ -23,6 +24,7 @@ public class User {
         this.password = user.password;
         this.email = user.email;
         this.rating = user.rating;
+        this.avatar = user.avatar;
     }
 
     public User() {
@@ -79,6 +81,7 @@ public class User {
     }
 
     public void setDefaultAvatar() {
-        this.avatar = "default";
+        this.avatar = "default.jpg";
+
     }
 }
