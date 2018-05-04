@@ -25,9 +25,8 @@ public class UserController {
     private static final String ERROR_PASSWORD = "Empty password";
     private static final String ERROR_NICKNAME = "Empty nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
-    private static UserDAO userService;
+    private UserDAO userService;
 
-    @SuppressWarnings("AccessStaticViaInstance")
     public UserController(UserDAO userService) {
         this.userService = userService;
     }
