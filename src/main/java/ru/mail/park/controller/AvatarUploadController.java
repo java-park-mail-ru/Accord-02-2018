@@ -19,9 +19,8 @@ import static ru.mail.park.Application.PATH_AVATARS_FOLDER;
 @CrossOrigin(origins = {"*", "http://127.0.0.1:8000"})
 public class AvatarUploadController {
     private static final String SESSION_KEY = Config.SESSION_KEY;
-    private static UserDAO userService;
+    private UserDAO userService;
 
-    @SuppressWarnings("AccessStaticViaInstance")
     public AvatarUploadController(UserDAO userService) {
         this.userService = userService;
     }
@@ -40,26 +39,24 @@ public class AvatarUploadController {
                 new ServerResponse("Ok", "Ready to load your avatar"));
     }
 
-    @SuppressWarnings({"OverlyBroadCatchBlock", "ConstantConditions", "IOResourceOpenedButNotSafelyClosed"})
     @PostMapping(value = "/updateAvatar")
     public ResponseEntity<?> handleFileUpload(@RequestParam("avatar") MultipartFile file, HttpSession httpSession) {
         final User userFromSession = (User) httpSession.getAttribute(SESSION_KEY);
-        final String oldFileName = file.getOriginalFilename();
-        final String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
-        final String nameFile = String.valueOf(userFromSession.getId()) + typeOfAvatar;
-
         if (userFromSession == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ServerResponse("Error", "You are not login"));
         }
+        final String oldFileName = file.getOriginalFilename();
+        final String typeOfAvatar = oldFileName.substring(oldFileName.lastIndexOf('.'));
+        final String nameFile = String.valueOf(userFromSession.getId()) + typeOfAvatar;
 
         if (!file.isEmpty()) {
             try {
                 final byte[] bytes = file.getBytes();
-                @SuppressWarnings("resource") final BufferedOutputStream stream = new BufferedOutputStream(
-                        new FileOutputStream(new File(PATH_AVATARS_FOLDER, nameFile)));
-                stream.write(bytes);
-                stream.close();
+                try (BufferedOutputStream stream = new BufferedOutputStream(
+                        new FileOutputStream(new File(PATH_AVATARS_FOLDER, nameFile)))) {
+                    stream.write(bytes);
+                }
 
                 userFromSession.setAvatar(nameFile);
 

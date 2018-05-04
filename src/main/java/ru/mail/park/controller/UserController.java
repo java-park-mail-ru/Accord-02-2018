@@ -1,6 +1,5 @@
 package ru.mail.park.controller;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.http.*;
 import ru.mail.park.dao.UserDAO;
 import ru.mail.park.exceptions.DatabaseConnectionException;
@@ -26,9 +25,8 @@ public class UserController {
     private static final String ERROR_PASSWORD = "Empty password";
     private static final String ERROR_NICKNAME = "Empty nickname";
     private static final int MAX_LENGTH_PASSWORD = 255;
-    private static UserDAO userService;
+    private UserDAO userService;
 
-    @SuppressWarnings("AccessStaticViaInstance")
     public UserController(UserDAO userService) {
         this.userService = userService;
     }
@@ -156,7 +154,7 @@ public class UserController {
 
             response.setContentType(MediaType.IMAGE_JPEG_VALUE);
             response.setStatus(HttpServletResponse.SC_OK);
-            IOUtils.copy(in, response.getOutputStream());
+            in.transferTo(response.getOutputStream());
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }

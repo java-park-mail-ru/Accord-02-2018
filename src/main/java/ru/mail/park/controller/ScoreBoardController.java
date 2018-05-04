@@ -18,10 +18,9 @@ import java.util.List;
 @CrossOrigin(origins = {"*", "http://127.0.0.1:8000"})
 public class ScoreBoardController {
     private static final int USER_PER_PAGE = 10;
-    private static UserDAO userService;
+    private UserDAO userService;
 
     public ScoreBoardController(UserDAO userService) {
-        //noinspection AccessStaticViaInstance
         this.userService = userService;
     }
 
