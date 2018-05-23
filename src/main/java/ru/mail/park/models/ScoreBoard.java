@@ -1,4 +1,4 @@
-package services.model;
+package ru.mail.park.models;
 
 import java.util.List;
 
@@ -31,6 +31,7 @@ public class ScoreBoard {
         return this.numberOfPages;
     }
 
+    @SuppressWarnings("unused")
     public List<User> getScoreBoard() {
         return this.scoreBoard;
     }

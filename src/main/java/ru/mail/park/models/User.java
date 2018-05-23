@@ -1,4 +1,4 @@
-package services.model;
+package ru.mail.park.models;
 
 
 @SuppressWarnings("unused")
@@ -15,7 +15,6 @@ public class User {
         this.password = password;
         this.email = email;
         this.rating = rating;
-        this.setDefaultAvatar();
     }
 
     public User(User user) {

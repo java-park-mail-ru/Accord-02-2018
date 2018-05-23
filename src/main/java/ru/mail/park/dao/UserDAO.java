@@ -1,11 +1,10 @@
-package services.dao;
+package ru.mail.park.dao;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
-import services.exceptions.DatabaseConnectionException;
-import services.model.User;
+import ru.mail.park.exceptions.DatabaseConnectionException;
+import ru.mail.park.models.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,10 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@Transactional
 public class UserDAO {
     private final JdbcTemplate jdbcTemplate;
-    private final Logger logger = LoggerFactory.getLogger(UserDAO.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
 
     public UserDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -29,7 +27,7 @@ public class UserDAO {
 
     public Boolean register(@NotNull User userToRegister) {
         try {
-            final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?);";
+            final String sql = "INSERT INTO \"User\" (email, nickname, password) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, userToRegister.getEmail(), userToRegister.getNickname(), userToRegister.getPassword());
             return true;
         } catch (DataAccessException e) {
@@ -39,14 +37,14 @@ public class UserDAO {
 
     public Boolean login(@NotNull User userToLogin) {
         try {
-            final String sql = "SELECT * FROM \"User\" WHERE email = ?;";
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?";
             final User user = jdbcTemplate.queryForObject(sql, new Object[]{userToLogin.getEmail()}, new UserMapper());
 
             if (user.getPassword().equals(userToLogin.getPassword())) {
                 return true;
             }
         } catch (DataAccessException e) {
-            logger.warn("Exception : ", e);
+            LOGGER.warn("Exception : ", e);
             throw new DatabaseConnectionException("Can't connect to the database", e);
         }
 
@@ -56,10 +54,10 @@ public class UserDAO {
 
     public User getUser(@NotNull String email) {
         try {
-            final String sql = "SELECT * FROM \"User\" WHERE email = ?;";
+            final String sql = "SELECT * FROM \"User\" WHERE email = ?";
             return jdbcTemplate.queryForObject(sql, new Object[]{email}, new UserMapper());
         } catch (DataAccessException e) {
-            logger.warn("Exception : ", e);
+            LOGGER.warn("Exception : ", e);
             throw new DatabaseConnectionException("Can't connect to the database", e);
         }
     }
@@ -103,7 +101,7 @@ public class UserDAO {
                 jdbcTemplate.update(sql.toString(), sqlParameters.toArray());
                 return true;
             } catch (DataAccessException e) {
-                logger.warn("Exception : ", e);
+                LOGGER.warn("Exception : ", e);
                 throw new DatabaseConnectionException("Can't connect to the database", e);
             }
         }
@@ -121,7 +119,7 @@ public class UserDAO {
                         new Object[]{userToUpdate.getAvatar(), userToUpdate.getEmail()});
                 return true;
             } catch (DataAccessException e) {
-                logger.warn("Exception : ", e);
+                LOGGER.warn("Exception : ", e);
                 throw new DatabaseConnectionException("Can't connect to the database", e);
             }
         }
@@ -135,7 +133,7 @@ public class UserDAO {
             final String sql = "SELECT * FROM \"User\" ORDER BY rating DESC LIMIT ? OFFSET ?;";
             return jdbcTemplate.query(sql, new Object[]{userPerPage, offset}, new UserInfoMapper());
         } catch (DataAccessException e) {
-            logger.warn("Exception : ", e);
+            LOGGER.warn("Exception : ", e);
             throw new DatabaseConnectionException("Can't connect to the database", e);
         }
     }
